@@ -5,16 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.junoyi</groupId>
-        <artifactId>JunoYI</artifactId>
+        <artifactId>junoyi-framework</artifactId>
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>junoyi-framework</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>junoyi-framework-core</module>
-        <module>junoyi-framework-web</module>
-    </modules>
+    <groupId>cn.junoyi.framework</groupId>
+    <artifactId>junoyi-framework-core</artifactId>
 
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
 </project>
