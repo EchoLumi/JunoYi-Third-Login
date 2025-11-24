@@ -17,6 +17,7 @@
     <modules>
         <module>junoyi-framework-core</module>
         <module>junoyi-framework-web</module>
+        <module>junoyi-framework-log</module>
     </modules>
 
 
