@@ -1,5 +1,0 @@
-junoyi:
-  log:
-    enabled: false
-    console:
-      color-enabled: false
