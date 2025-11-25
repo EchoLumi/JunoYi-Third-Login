@@ -41,16 +41,7 @@ public class JunoYiLoggerInjector implements BeanPostProcessor {
      */
     private Object enhanceBeanWithLogger(Object originalBean, Class<?> originalClass) {
         try {
-            // 检查是否已经有log字段
-            try {
-                originalClass.getDeclaredField("log");
-                System.out.println("类已存在log字段: " + originalClass.getName());
-                // 如果已经有log字段，直接返回
-                return originalBean;
-            } catch (NoSuchFieldException e) {
-                // 没有log字段，需要添加
-                System.out.println("开始为类添加log字段: " + originalClass.getName());
-            }
+            System.out.println("开始为类添加log字段: " + originalClass.getName());
 
             // 使用ByteBuddy创建增强类
             DynamicType.Builder<?> builder = new ByteBuddy()
@@ -77,7 +68,7 @@ public class JunoYiLoggerInjector implements BeanPostProcessor {
             // 复制原始Bean的属性到增强Bean
             copyProperties(originalBean, enhancedBean);
 
-            System.out.println("🎉 成功创建增强Bean: " + enhancedClass.getName());
+            System.out.println("成功创建增强Bean: " + enhancedClass.getName());
             return enhancedBean;
 
         } catch (Exception e) {
