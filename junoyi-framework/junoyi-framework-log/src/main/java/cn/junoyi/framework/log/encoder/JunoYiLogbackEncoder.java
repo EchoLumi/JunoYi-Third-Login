@@ -97,10 +97,10 @@ public class JunoYiLogbackEncoder extends EncoderBase<ILoggingEvent> {
         String levelColor = getLevelColor(event.getLevel());
         sb.append(colorEnabled ? levelColor : "")
                 .append(String.format("%7s", levelStr))
-                .append(reset)
-                .append(" ");
+                .append(reset);
 
-        // 日志消息（根据级别着色）
+        // 日志消息（根据级别着色，另起一行）
+        sb.append("\n  - ");
         String messageColor = getMessageColor(event.getLevel());
         sb.append(colorEnabled ? messageColor : "")
                 .append(event.getFormattedMessage())
