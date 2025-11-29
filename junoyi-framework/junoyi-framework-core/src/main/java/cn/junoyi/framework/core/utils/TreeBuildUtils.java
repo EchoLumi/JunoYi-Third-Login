@@ -5,19 +5,19 @@ import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.lang.tree.TreeNodeConfig;
 import cn.hutool.core.lang.tree.TreeUtil;
 import cn.hutool.core.lang.tree.parser.NodeParser;
-import com.jxd.common.core.utils.reflect.ReflectUtils;
+import cn.junoyi.framework.core.utils.reflect.ReflectUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 /**
- * 扩展 hutool TreeUtil 封装系统树构建
+ * 拓展 hutool TreeUtil 封装系统树构建
  *
  * @author Fan
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class TreeBuildUtils extends TreeUtil {
+public class TreeBuildUtils {
 
     /**
      * 根据前端定制差异化字段
@@ -31,5 +31,4 @@ public class TreeBuildUtils extends TreeUtil {
         K k = ReflectUtils.invokeGetter(list.get(0), "parentId");
         return TreeUtil.build(list, k, DEFAULT_CONFIG, nodeParser);
     }
-
 }
