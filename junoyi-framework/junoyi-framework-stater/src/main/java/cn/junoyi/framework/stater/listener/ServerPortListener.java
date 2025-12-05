@@ -14,7 +14,7 @@ import java.util.Enumeration;
 
 /**
 * 服务器端口监听器
-* Prints server port information when application starts
+* 在服务器启动时候，打印服务器端口、访问地址等信息
 *
 * @author Fan
 */
