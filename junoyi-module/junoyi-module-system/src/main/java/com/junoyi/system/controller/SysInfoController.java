@@ -39,4 +39,14 @@ public class SysInfoController {
                 .build();
         return R.ok(systemInfoVo);
     }
+
+    /**
+     * 获取LOGO
+     */
+    @GetMapping("/logo")
+    public R<byte[]> getLogo(){
+
+
+        return R.ok();
+    }
 }
