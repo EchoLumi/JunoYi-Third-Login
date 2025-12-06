@@ -35,6 +35,7 @@ public class SysInfoController {
                 .copyrightYear(junoYiProperties.getCopyrightYear())
                 .copyright(junoYiProperties.getCopyright())
                 .registration(junoYiProperties.getRegistration())
+                .logo(junoYiProperties.getLogo())
                 .build();
         return R.ok(systemInfoVo);
     }

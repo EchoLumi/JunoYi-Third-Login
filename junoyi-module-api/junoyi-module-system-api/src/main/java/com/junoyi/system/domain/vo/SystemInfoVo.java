@@ -16,6 +16,5 @@ public class SystemInfoVo {
     private String copyrightYear;
     private String copyright;
     private String registration;
-
-
+    private String logo;
 }
