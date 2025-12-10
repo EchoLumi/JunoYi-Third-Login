@@ -14,11 +14,18 @@
 
     <!--  依赖  -->
     <dependencies>
-        <!-- 功能模块 -->
+        <!--   框架核心启动模块     -->
+        <dependency>
+            <groupId>com.junoyi</groupId>
+            <artifactId>junoyi-framework-starter</artifactId>
+        </dependency>
+
+        <!-- 系统模块 -->
         <dependency>
             <groupId>com.junoyi</groupId>
             <artifactId>junoyi-module-system</artifactId>
         </dependency>
+
 
         <!-- ==================== 开发工具依赖 ==================== -->
         <!-- 
