@@ -62,8 +62,12 @@ public class EventBus {
      *
      * @param listener 要注册的监听器对象
      */
-    public void registerListener(Listener listener){
+    public void registerListener(Object listener){
         registry.registerListener(listener);
+    }
+
+    public void registerListener(Listener listener){
+        registerListener((Object) listener);
     }
 
     /**
@@ -78,6 +82,8 @@ public class EventBus {
         // 获取该事件类型对应的所有已注册处理器
         List<RegisteredHandler> handlers = registry.getHandlers(event.getClass());
         int handlerCount = handlers.size();
+        if (handlerCount <= 0)
+            return;
         log.info("EventTrigger", "Event="+event.getClass().getSimpleName() + " | " + "HandlerCount=" + handlerCount );
         // 按优先级顺序遍历并调用每个处理器的方法
         for (RegisteredHandler handler : handlers){

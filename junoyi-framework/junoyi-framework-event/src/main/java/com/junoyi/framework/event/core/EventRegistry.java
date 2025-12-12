@@ -25,7 +25,7 @@ public class EventRegistry {
      *
      * @param listener 事件监听器实例
      */
-    public void registerListener(Listener listener) {
+    public void registerListener(Object listener) {
         for (Method method : listener.getClass().getDeclaredMethods()){
             if (!method.isAnnotationPresent(EventHandler.class))
                 continue;

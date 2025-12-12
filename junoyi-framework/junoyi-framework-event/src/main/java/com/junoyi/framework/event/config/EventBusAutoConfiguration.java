@@ -1,6 +1,7 @@
 package com.junoyi.framework.event.config;
 
 import com.junoyi.framework.event.core.EventBus;
+import com.junoyi.framework.event.core.EventListenerScanner;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import jakarta.annotation.PreDestroy;
@@ -29,6 +30,18 @@ public class EventBusAutoConfiguration {
         log.info("The event bus has been registered as a Bean.");
         return eventBus;
     }
+
+    /**
+     * 创建并配置事件监听器扫描器Bean
+     *
+     * @param eventBus 事件总线实例，用于注册和管理事件监听器
+     * @return 配置好的事件监听器扫描器实例
+     */
+    @Bean
+    public EventListenerScanner eventListenerScanner(EventBus eventBus) {
+        return new EventListenerScanner(eventBus);
+    }
+
 
     /**
      * 在Spring容器销毁时自动调用，释放EventBus的线程池资源

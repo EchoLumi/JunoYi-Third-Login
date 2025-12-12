@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
  * @author Fan
  */
 public record RegisteredHandler (
-        Listener listener,
+        Object listener,
         Method method,
         EventPriority priority,
         boolean async
