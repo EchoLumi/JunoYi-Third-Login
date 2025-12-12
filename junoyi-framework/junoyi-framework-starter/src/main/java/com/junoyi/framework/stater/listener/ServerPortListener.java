@@ -28,24 +28,24 @@ public class ServerPortListener implements ApplicationListener<ApplicationEvent>
    private volatile boolean printed;
 
     /**
-     * 应用事件监听器，用于在Web服务器初始化完成后打印应用访问地址信息
+     * 处理应用程序事件回调方法
+     * 当Web服务器初始化完成或应用程序启动完成时执行相应逻辑
      *
-     * @param event 应用事件对象，支持WebServerInitializedEvent和ApplicationStartedEvent两种事件类型
+     * @param event 应用程序事件对象，不能为空
      */
    @Override
    public void onApplicationEvent(@NonNull ApplicationEvent event) {
-       // 处理Web服务器初始化完成事件，获取端口和协议信息
        if (event instanceof WebServerInitializedEvent webServerInitializedEvent) {
            this.port = webServerInitializedEvent.getWebServer().getPort();
            this.protocol = webServerInitializedEvent.getApplicationContext().getEnvironment()
                    .getProperty("server.ssl.enabled", "false").equals("true") ? "https" : "http";
            return;
        }
-        // 处理应用启动完成事件，打印访问地址信息
+
        if (event instanceof ApplicationStartedEvent) {
-           // 避免重复打印或在必要信息未准备就绪时跳过打印
-           if (printed || port == null || protocol == null)
+           if (printed || port == null || protocol == null) {
                return;
+           }
            printed = true;
 
            try {
@@ -56,7 +56,7 @@ public class ServerPortListener implements ApplicationListener<ApplicationEvent>
                JunoYiLogStatic.info("External:   {}://{}:{}", protocol, hostAddress, port);
                JunoYiLogStatic.info("Host Name:  " + hostName);
            } catch (Exception e) {
-               // 无法获取主机地址时的错误处理，输出简化版访问信息
+               // 无法获取主机地址错误处理
                JunoYiLogStatic.warn("Unable to determine host address: {}", e.getMessage());
                JunoYiLogStatic.info("Application is running...");
                JunoYiLogStatic.info("Access URLs:");
