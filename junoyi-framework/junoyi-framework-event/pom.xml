@@ -22,17 +22,19 @@
             <artifactId>junoyi-framework-log</artifactId>
         </dependency>
 
-<!-- Spring Boot 自动配置依赖 -->
+        <!-- Spring Boot 自动配置依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
             <optional>true</optional>
         </dependency>
 
+        <!-- Spring Boot 上下文 -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <optional>true</optional>
         </dependency>
+
     </dependencies>
 </project>

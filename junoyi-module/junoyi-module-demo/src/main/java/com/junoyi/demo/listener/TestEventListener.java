@@ -3,7 +3,7 @@ package com.junoyi.demo.listener;
 import com.junoyi.demo.event.TestEvent;
 import com.junoyi.framework.event.annotation.EventHandler;
 import com.junoyi.framework.event.annotation.EventListener;
-import com.junoyi.framework.event.domain.spring.SpringApplicationStartedEvent;
+import com.junoyi.framework.event.domain.spring.SpringApplicationReadyEvent;
 import com.junoyi.framework.event.enums.EventPriority;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
@@ -19,10 +19,11 @@ public class TestEventListener {
      * SpringApplicationStartedEvent被触发时候
      * @param event SpringApplicationStartedEvent
      */
-    @EventHandler
-    public void onSpringApplicationStartedEvent(SpringApplicationStartedEvent event){
-
-
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onSpringApplicationReadyEvent(SpringApplicationReadyEvent event){
+        System.out.println("===============");
+        System.out.println(" 测试  SpringApplicationReadyEvent 事件监听");
+        System.out.println("===============");
     }
 
     /**
