@@ -1,6 +1,7 @@
 package com.junoyi.framework.event.spring.adapter;
 
 import com.junoyi.framework.event.core.Event;
+import com.junoyi.framework.event.domain.spring.SpringContextStartedEvent;
 import com.junoyi.framework.event.spring.SpringEventAdapter;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,6 @@ public class SpringContextStartedEventAdapter implements SpringEventAdapter<Cont
     @Override
     public Event adapt(Object springEvent) {
         ContextStartedEvent contextStartedEvent = (ContextStartedEvent) springEvent;
-        return null;
+        return new SpringContextStartedEvent(contextStartedEvent.getApplicationContext());
     }
 }
