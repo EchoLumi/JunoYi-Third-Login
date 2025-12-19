@@ -77,6 +77,12 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
+        <!--   数据     -->
+        <dependency>
+            <groupId>com.junoyi</groupId>
+            <artifactId>junoyi-framework-datasource</artifactId>
+        </dependency>
+
         <!-- 日志模块 -->
         <dependency>
             <groupId>com.junoyi</groupId>
