@@ -2,6 +2,7 @@ package com.junoyi.framework.security.helper;
 
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
+import com.junoyi.framework.security.module.LoginUser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,18 +16,23 @@ public class TokenHelper {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(TokenHelper.class);
 
-    @Value("${junoyi.security.token.header:Authorization}")
-    private String header;
-
     @Value("${junoyi.security.token.secret:}")
     private String secret;
 
+    /**
+     * 生成AccessToken
+     * @return 返回AccessToken
+     */
+    public String createAccessToken(LoginUser loginUser){
+        return null;
+    }
 
     /**
-     * 生成token
-     * @return 返回生成好的token
+     * 生成RefreshToken
+     * @return 返回RefreshToken
      */
-    public String test(){
+    public String createRefreshToken(){
+
         return null;
     }
 }

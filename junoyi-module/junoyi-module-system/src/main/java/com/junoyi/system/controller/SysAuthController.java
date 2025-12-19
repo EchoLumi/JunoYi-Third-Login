@@ -31,6 +31,19 @@ public class SysAuthController extends BaseController {
         return R.ok();
     }
 
+    /**
+     * 刷新accessToken
+     * 客户端通过传递refreshToken，验证refreshToken是否有效，
+     * 来刷新accessToken，从而延长登录时间
+     *
+     * @return R<?> 统一响应结果
+     */
+    @PostMapping("/refresh")
+    public R<?> refresh(){
+
+        return R.ok();
+    }
+
 
     /**
      * 获取用户信息接口

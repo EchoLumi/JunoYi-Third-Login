@@ -16,7 +16,7 @@ junoyi:
   # 版权年份（可选）
   copyrightYear: 2025
   copyright: JunoYi钧逸
-  # 网站备案号L
+  # 网站备案号
   registration: 苏@123456
   # LOGO 图片文件（在resources/public/目录中存放，这里指定文件名）
   logo: LOGO.png
@@ -105,6 +105,13 @@ junoyi:
 
   # ==================== 安全验证配置 ====================
   security:
+    # api 接口加密 (建议: 开发环境将接口加密关闭方便调试，生产环境开启保证安全)
+    api-encrypt:
+      enable: false
+      # 是否加密请求体
+      request: true
+      # 是否加密响应体
+      response: true
     # 白名单路径
     whitelist:
       - /auth/login
@@ -112,9 +119,19 @@ junoyi:
     token:
       header: Authorization
       # 令牌密钥
-      secret: abcdefghijklmnopqrstuvwxyz
-      # 令牌有效期（默认30分钟）
-      expireTime: 30
+      secret: fd5K48pq6pyZaBoYk56mGiEWVM4qcX0k9PHR
+      # Access Token 有效期
+      access-expire:
+        web: 30m
+        miniprogram: 12h
+        app: 24h
+        desktop: 7d
+      # Refresh Token 有效期
+      refresh-expire:
+        web: 7d
+        miniprogram: 30d
+        app: 30d
+        desktop: 90d
 
 
 # Spring Boot服务器配置
