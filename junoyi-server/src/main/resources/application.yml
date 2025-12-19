@@ -147,6 +147,7 @@ logging:
     org.springframework.context.support.PostProcessorRegistrationDelegate: ERROR
     # 屏蔽 Netty DNS 警告
     io.netty.resolver.dns: ERROR
+#    com.junoyi: DEBUG
 
 
 # ==================== Spring Boot 配置 ====================
