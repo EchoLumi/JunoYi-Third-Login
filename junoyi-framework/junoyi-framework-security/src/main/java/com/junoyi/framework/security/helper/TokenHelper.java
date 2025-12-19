@@ -2,10 +2,9 @@ package com.junoyi.framework.security.helper;
 
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
-import com.junoyi.framework.redis.utils.RedisUtils;
 import com.junoyi.framework.security.module.LoginUser;
-import org.redisson.api.RateType;
-import org.springframework.beans.factory.annotation.Value;
+import com.junoyi.framework.security.properties.SecurityProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,12 +13,12 @@ import org.springframework.stereotype.Component;
  * @author Fan
  */
 @Component
+@RequiredArgsConstructor
 public class TokenHelper {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(TokenHelper.class);
 
-    @Value("${junoyi.security.token.secret:}")
-    private String secret;
+    private SecurityProperties securityProperties;
 
     /**
      * 生成AccessToken
