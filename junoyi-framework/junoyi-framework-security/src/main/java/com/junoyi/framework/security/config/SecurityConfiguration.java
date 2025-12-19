@@ -1,5 +1,8 @@
 package com.junoyi.framework.security.config;
 
+import com.junoyi.framework.log.core.JunoYiLog;
+import com.junoyi.framework.log.core.JunoYiLogFactory;
+import com.junoyi.framework.security.filter.ApiEncryptFilter;
 import com.junoyi.framework.security.filter.JwtAuthenticationTokenFilter;
 import com.junoyi.framework.security.helper.TokenHelper;
 import com.junoyi.framework.security.properties.SecurityProperties;
@@ -19,10 +22,36 @@ import org.springframework.util.AntPathMatcher;
 @EnableConfigurationProperties(SecurityProperties.class)
 @RequiredArgsConstructor
 public class SecurityConfiguration {
+
+    private final JunoYiLog log = JunoYiLogFactory.getLogger(SecurityConfiguration.class);
     
     private final TokenHelper tokenHelper;
 
     private final SecurityProperties securityProperties;
+
+    /**
+     * 注册 API 加密过滤器
+     * 在 JWT 认证之前执行，用于解密请求和加密响应
+     *
+     * @return FilterRegistrationBean 过滤器注册对象
+     */
+    @Bean
+    public FilterRegistrationBean<ApiEncryptFilter> apiEncryptFilter() {
+        // 创建过滤器实例
+        ApiEncryptFilter filter = new ApiEncryptFilter(securityProperties);
+        
+        FilterRegistrationBean<ApiEncryptFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        // 拦截所有请求
+        registrationBean.addUrlPatterns("/*");
+        // 设置过滤器执行顺序（在 JWT 认证之前执行）
+        registrationBean.setOrder(0);
+        registrationBean.setName("apiEncryptFilter");
+        
+        log.info("FilterRegistrationBean","API encryption filter has been registered.");
+        
+        return registrationBean;
+    }
 
     /**
      * 注册 JWT 认证过滤器
@@ -39,11 +68,11 @@ public class SecurityConfiguration {
         registrationBean.setFilter(filter);
         // 拦截所有请求
         registrationBean.addUrlPatterns("/*");
-        // 设置过滤器执行顺序（数字越小优先级越高）
+        // 设置过滤器执行顺序（在 API 加密之后执行）
         registrationBean.setOrder(1);
         registrationBean.setName("jwtAuthenticationTokenFilter");
         
-        System.out.println("✅ JWT 认证过滤器已注册");
+        log.info("FilterRegistrationBean","JWT authentication filter has been registered.");
         
         return registrationBean;
     }
