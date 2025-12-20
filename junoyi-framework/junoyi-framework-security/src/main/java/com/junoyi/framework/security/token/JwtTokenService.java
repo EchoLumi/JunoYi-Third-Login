@@ -16,8 +16,10 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.junoyi.framework.core.constant.Constants.*;
 
 /**
  * JWT Token 服务实现类
@@ -40,19 +42,8 @@ import java.util.UUID;
 public class JwtTokenService implements TokenService {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(JwtTokenService.class);
+
     private final SecurityProperties securityProperties;
-
-    // Token 类型常量
-    private static final String TOKEN_TYPE_ACCESS = "access";
-    private static final String TOKEN_TYPE_REFRESH = "refresh";
-
-    // Claim 键名常量
-    private static final String CLAIM_TYPE = "type";
-    private static final String CLAIM_TOKEN_ID = "tid";      // 关联 AccessToken 和 RefreshToken
-    private static final String CLAIM_JTI = "jti";           // 单个 Token 的唯一标识
-    private static final String CLAIM_PLATFORM = "platform";
-    private static final String CLAIM_USERNAME = "username";
-    private static final String CLAIM_NICK_NAME = "nickName";
 
     /**
      * 创建 Token 对（AccessToken + RefreshToken）
@@ -95,14 +86,29 @@ public class JwtTokenService implements TokenService {
     private String buildAccessToken(LoginUser loginUser, String tokenId, Date now, Date expiration) {
         String jti = UUID.randomUUID().toString().replace("-", "");
         
-        return Jwts.builder()
+        JwtBuilder builder = Jwts.builder()
                 .subject(String.valueOf(loginUser.getUserId()))
                 .claim(CLAIM_TYPE, TOKEN_TYPE_ACCESS)
                 .claim(CLAIM_TOKEN_ID, tokenId)          // 关联标识
                 .claim(CLAIM_JTI, jti)                   // 独立唯一标识
                 .claim(CLAIM_PLATFORM, loginUser.getPlatformType().getCode())
                 .claim(CLAIM_USERNAME, loginUser.getUserName())
-                .claim(CLAIM_NICK_NAME, loginUser.getNickName())
+                .claim(CLAIM_NICK_NAME, loginUser.getNickName());
+        
+        // 添加权限列表（如果存在）
+        if (loginUser.getPermissions() != null && !loginUser.getPermissions().isEmpty()) {
+            builder.claim(CLAIM_PERMISSIONS, String.join(",", loginUser.getPermissions()));
+        }
+        
+        // 添加角色列表（如果存在）
+        if (loginUser.getRoles() != null && !loginUser.getRoles().isEmpty()) {
+            builder.claim(CLAIM_ROLES, loginUser.getRoles().stream()
+                    .map(String::valueOf)
+                    .reduce((a, b) -> a + "," + b)
+                    .orElse(""));
+        }
+        
+        return builder
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(getSecretKey(), Jwts.SIG.HS512)
@@ -163,9 +169,8 @@ public class JwtTokenService implements TokenService {
      */
     @Override
     public boolean validateAccessToken(String accessToken) {
-        if (StringUtils.isBlank(accessToken)) {
+        if (StringUtils.isBlank(accessToken))
             return false;
-        }
 
         try {
             Claims claims = parseToken(accessToken);
@@ -220,17 +225,15 @@ public class JwtTokenService implements TokenService {
      */
     @Override
     public boolean validateRefreshToken(String refreshToken) {
-        if (StringUtils.isBlank(refreshToken)) {
+        if (StringUtils.isBlank(refreshToken))
             return false;
-        }
 
         try {
             Claims claims = parseToken(refreshToken);
             String tokenType = claims.get(CLAIM_TYPE, String.class);
             
-            if (!TOKEN_TYPE_REFRESH.equals(tokenType)) {
+            if (!TOKEN_TYPE_REFRESH.equals(tokenType))
                 return false;
-            }
 
             return claims.getSubject() != null && claims.getExpiration() != null;
 
@@ -247,14 +250,12 @@ public class JwtTokenService implements TokenService {
     @Override
     public TokenPair refreshTokenPair(String refreshToken) {
         try {
-            if (!validateRefreshToken(refreshToken)) {
+            if (!validateRefreshToken(refreshToken))
                 throw new IllegalArgumentException("RefreshToken 无效或已过期");
-            }
 
             LoginUser loginUser = parseRefreshToken(refreshToken);
-            if (loginUser == null) {
+            if (loginUser == null)
                 throw new IllegalArgumentException("无法从 RefreshToken 中解析用户信息");
-            }
 
             // 创建全新的 Token 对（新的 tokenId）
             TokenPair newTokenPair = createTokenPair(loginUser);
@@ -309,12 +310,30 @@ public class JwtTokenService implements TokenService {
         String nickName = claims.get(CLAIM_NICK_NAME, String.class);
         Integer platformCode = claims.get(CLAIM_PLATFORM, Integer.class);
 
-        return LoginUser.builder()
+        LoginUser.LoginUserBuilder builder = LoginUser.builder()
                 .userId(userId)
                 .userName(username)
                 .nickName(nickName)
-                .platformType(getPlatformType(platformCode))
-                .build();
+                .platformType(getPlatformType(platformCode));
+        
+        // 提取权限列表
+        String permsStr = claims.get(CLAIM_PERMISSIONS, String.class);
+        if (StringUtils.isNotBlank(permsStr)) {
+            Set<String> permissions = new HashSet<>(Arrays.asList(permsStr.split(",")));
+            builder.permissions(permissions);
+        }
+        
+        // 提取角色列表
+        String rolesStr = claims.get(CLAIM_ROLES, String.class);
+        if (StringUtils.isNotBlank(rolesStr)) {
+            Set<Long> roles = Arrays.stream(rolesStr.split(","))
+                    .filter(StringUtils::isNotBlank)
+                    .map(Long::parseLong)
+                    .collect(Collectors.toSet());
+            builder.roles(roles);
+        }
+
+        return builder.build();
     }
 
     /**
@@ -323,10 +342,9 @@ public class JwtTokenService implements TokenService {
     private SecretKey getSecretKey() {
         String secret = securityProperties.getToken().getSecret();
         
-        if (secret == null || secret.length() < 32) {
+        if (secret == null || secret.length() < 32)
             throw new IllegalStateException("JWT 密钥长度不足，至少需要 32 个字符");
-        }
-        
+
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -337,10 +355,9 @@ public class JwtTokenService implements TokenService {
         String platformKey = getPlatformKey(platformType);
         String expireStr = securityProperties.getToken().getAccessExpire().get(platformKey);
         
-        if (StringUtils.isBlank(expireStr)) {
+        if (StringUtils.isBlank(expireStr))
             return Duration.ofMinutes(30);
-        }
-        
+
         return DurationStyle.detectAndParse(expireStr);
     }
 
@@ -351,10 +368,9 @@ public class JwtTokenService implements TokenService {
         String platformKey = getPlatformKey(platformType);
         String expireStr = securityProperties.getToken().getRefreshExpire().get(platformKey);
         
-        if (StringUtils.isBlank(expireStr)) {
+        if (StringUtils.isBlank(expireStr))
             return Duration.ofDays(7);
-        }
-        
+
         return DurationStyle.detectAndParse(expireStr);
     }
 
@@ -374,14 +390,12 @@ public class JwtTokenService implements TokenService {
      * 根据平台代码获取平台类型
      */
     private PlatformType getPlatformType(Integer code) {
-        if (code == null) {
+        if (code == null)
             return PlatformType.ADMIN_WEB;
-        }
-        
+
         for (PlatformType type : PlatformType.values()) {
-            if (type.getCode() == code) {
+            if (type.getCode() == code)
                 return type;
-            }
         }
         
         return PlatformType.ADMIN_WEB;

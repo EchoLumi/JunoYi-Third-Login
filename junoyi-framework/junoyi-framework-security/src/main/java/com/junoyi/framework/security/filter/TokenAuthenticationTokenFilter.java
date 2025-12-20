@@ -4,9 +4,11 @@ import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.security.context.SecurityContext;
-import com.junoyi.framework.security.token.JwtTokenService;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.properties.SecurityProperties;
+import com.junoyi.framework.security.session.SessionService;
+import com.junoyi.framework.security.session.UserSession;
+import com.junoyi.framework.security.token.JwtTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,9 +21,14 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * JWT 认证过滤器
+ * Token 认证过滤器
  * 用于拦截请求并验证 Token 的有效性
- * 继承 OncePerRequestFilter 确保每个请求只执行一次过滤
+ * 
+ * 验证流程：
+ * 1. 检查白名单
+ * 2. 验证 Token 签名（JWT 自验证）
+ * 3. 从 Redis 获取会话（获取最新权限）
+ * 4. 将用户信息存入上下文
  *
  * @author Fan
  */
@@ -30,20 +37,12 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(TokenAuthenticationTokenFilter.class);
 
-    private final JwtTokenService tokenHelper;
-
+    private final JwtTokenService tokenService;
+    private final SessionService sessionService;
     private final SecurityProperties securityProperties;
+    
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    /**
-     * 执行过滤逻辑
-     *
-     * @param request     HTTP 请求对象
-     * @param response    HTTP 响应对象
-     * @param filterChain 过滤器链
-     * @throws ServletException Servlet 异常
-     * @throws IOException      IO 异常
-     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -62,46 +61,54 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
 
         if (StringUtils.isBlank(token)) {
             log.warn("TokenMissing", "URI: " + requestURI);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":401,\"msg\":\"未提供认证令牌\"}");
+            sendUnauthorized(response, "未提供认证令牌");
             return;
         }
 
         try {
-            // 验证 Token 有效性
-            if (!tokenHelper.validateAccessToken(token)) {
+            // 验证 Token 签名（JWT 自验证，不查 Redis）
+            if (!tokenService.validateAccessToken(token)) {
                 log.warn("TokenInvalid", "URI: " + requestURI + " | Token: " + maskToken(token));
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"code\":401,\"msg\":\"认证令牌无效或已过期\"}");
+                sendUnauthorized(response, "认证令牌无效或已过期");
                 return;
             }
 
-            // 解析 Token 获取用户信息
-            LoginUser loginUser = tokenHelper.parseAccessToken(token);
-
-            if (loginUser == null) {
-                log.warn("TokenParseError", "URI: " + requestURI);
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"code\":401,\"msg\":\"认证令牌无效或已过期\"}");
+            // 从 Redis 获取会话（获取最新的权限信息）
+            UserSession session = sessionService.getSession(token);
+            
+            if (session == null) {
+                // 会话不存在（可能被踢出或主动登出）
+                log.warn("SessionNotFound", "URI: " + requestURI + " | Token: " + maskToken(token));
+                sendUnauthorized(response, "会话已失效，请重新登录");
                 return;
             }
+
+            // 构建 LoginUser（从会话中获取最新权限）
+            LoginUser loginUser = LoginUser.builder()
+                    .userId(session.getUserId())
+                    .userName(session.getUserName())
+                    .nickName(session.getNickName())
+                    .platformType(session.getPlatformType())
+                    .permissions(session.getPermissions())
+                    .roles(session.getRoles())
+                    .loginIp(session.getLoginIp())
+                    .loginTime(session.getLoginTime())
+                    .build();
 
             // 将用户信息存储到上下文中
             SecurityContext.set(loginUser);
 
+            // 更新最后访问时间
+            String tokenId = tokenService.getTokenId(token);
+            sessionService.touch(tokenId);
+
             log.debug("TokenValidated", "User: " + loginUser.getUserName() + " | URI: " + requestURI);
 
-            // 继续执行过滤器链
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
             log.error("TokenValidationError", "URI: " + requestURI, e);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":401,\"msg\":\"认证失败\"}");
+            sendUnauthorized(response, "认证失败");
         } finally {
             // 清理上下文
             SecurityContext.clear();
@@ -109,35 +116,33 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
     }
 
     /**
+     * 发送 401 未授权响应
+     */
+    private void sendUnauthorized(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"code\":401,\"msg\":\"" + message + "\"}");
+    }
+
+    /**
      * 从请求中获取 Token
-     *
-     * @param request HTTP 请求对象
-     * @return Token 字符串，如果不存在则返回 null
      */
     private String getTokenFromRequest(HttpServletRequest request) {
-        // 从请求头中获取
-        String token = request.getHeader(securityProperties.getToken().getHeader());
+        String headerName = securityProperties.getToken().getHeader();
+        String token = request.getHeader(headerName);
 
         if (StringUtils.isNotBlank(token)) {
-            // 移除请求头token前缀（如果存在）
-            if (token.startsWith(securityProperties.getToken().getHeader() + " "))
+            // 移除 Bearer 前缀（如果存在）
+            if (token.startsWith("Bearer "))
                 token = token.substring(7);
             return token;
         }
 
-        // 从请求参数中获取（备用方案）
-        token = request.getParameter("token");
-        if (StringUtils.isNotBlank(token))
-            return token;
-
-        return null;
+        return request.getParameter("token");
     }
 
     /**
      * 检查请求路径是否在白名单中
-     *
-     * @param requestURI 请求 URI
-     * @return true=在白名单中，false=不在白名单中
      */
     private boolean isWhitelisted(String requestURI) {
         List<String> whitelist = securityProperties.getWhitelist();
@@ -154,9 +159,6 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
 
     /**
      * 脱敏 Token（用于日志输出）
-     *
-     * @param token 原始 Token
-     * @return 脱敏后的 Token
      */
     private String maskToken(String token) {
         if (StringUtils.isBlank(token) || token.length() < 10)

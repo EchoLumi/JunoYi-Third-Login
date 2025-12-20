@@ -4,8 +4,9 @@ import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.security.filter.ApiEncryptFilter;
 import com.junoyi.framework.security.filter.TokenAuthenticationTokenFilter;
-import com.junoyi.framework.security.token.JwtTokenService;
 import com.junoyi.framework.security.properties.SecurityProperties;
+import com.junoyi.framework.security.session.SessionService;
+import com.junoyi.framework.security.token.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -25,8 +26,8 @@ public class SecurityConfiguration {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SecurityConfiguration.class);
     
-    private final JwtTokenService tokenHelper;
-
+    private final JwtTokenService tokenService;
+    private final SessionService sessionService;
     private final SecurityProperties securityProperties;
 
     /**
@@ -37,51 +38,43 @@ public class SecurityConfiguration {
      */
     @Bean
     public FilterRegistrationBean<ApiEncryptFilter> apiEncryptFilter() {
-        // 创建过滤器实例
         ApiEncryptFilter filter = new ApiEncryptFilter(securityProperties);
         
         FilterRegistrationBean<ApiEncryptFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
-        // 拦截所有请求
         registrationBean.addUrlPatterns("/*");
-        // 设置过滤器执行顺序（在 JWT 认证之前执行）
         registrationBean.setOrder(0);
         registrationBean.setName("apiEncryptFilter");
         
-        log.info("FilterRegistrationBean","API encryption filter has been registered.");
+        log.info("FilterRegistered", "API 加密过滤器已注册");
         
         return registrationBean;
     }
 
     /**
-     * 注册 JWT 认证过滤器
-     * 设置过滤器的执行顺序和拦截路径
+     * 注册 Token 认证过滤器
+     * 验证 Token 并从 Redis 获取会话信息
      *
      * @return FilterRegistrationBean 过滤器注册对象
      */
     @Bean
-    public FilterRegistrationBean<TokenAuthenticationTokenFilter> jwtAuthenticationFilter() {
-        // 创建过滤器实例
-        TokenAuthenticationTokenFilter filter = new TokenAuthenticationTokenFilter(tokenHelper, securityProperties);
+    public FilterRegistrationBean<TokenAuthenticationTokenFilter> tokenAuthenticationFilter() {
+        TokenAuthenticationTokenFilter filter = new TokenAuthenticationTokenFilter(
+                tokenService, sessionService, securityProperties);
         
         FilterRegistrationBean<TokenAuthenticationTokenFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
-        // 拦截所有请求
         registrationBean.addUrlPatterns("/*");
-        // 设置过滤器执行顺序（在 API 加密之后执行）
         registrationBean.setOrder(1);
-        registrationBean.setName("jwtAuthenticationTokenFilter");
+        registrationBean.setName("tokenAuthenticationFilter");
         
-        log.info("FilterRegistrationBean","Token authentication filter has been registered.");
+        log.info("FilterRegistered", "Token 认证过滤器已注册");
         
         return registrationBean;
     }
 
     /**
      * 注册路径匹配器 Bean
-     * 用于白名单路径匹配
-     *
-     * @return AntPathMatcher 实例
      */
     @Bean
     public AntPathMatcher antPathMatcher() {
