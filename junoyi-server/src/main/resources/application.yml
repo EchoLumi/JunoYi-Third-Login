@@ -134,6 +134,10 @@ junoyi:
       header: Authorization
       # 令牌密钥 (HS512 算法要求至少 64 字符)
       secret: fd5K48pq6pyZaBoYk56mGiEWVM4qcX0k9PHRjunoyi2025SecureTokenKeyForHS512Algorithm
+      # 是否开启单点登录（同一平台只允许一个会话）
+      # true: 单点登录，同平台重复登录会被拒绝
+      # false: 多点登录，允许同平台多个会话（默认）
+      single-login: false
       # Access Token 有效期（不同平台不同有效期）
       access-expire:
         admin-web: 30m      # 后台管理 Web（安全要求高，有效期短）

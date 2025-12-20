@@ -68,6 +68,13 @@ public class SecurityProperties {
         private String secret;
 
         /**
+         * 是否开启单点登录（同一平台只允许一个会话）
+         * true: 单点登录，同平台重复登录会被拒绝
+         * false: 多点登录，允许同平台多个会话
+         */
+        private boolean singleLogin = false;
+
+        /**
          * 访问令牌过期时间配置，key为用户类型，value为过期时间
          */
         private Map<String, String> accessExpire;

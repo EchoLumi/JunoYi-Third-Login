@@ -4,7 +4,9 @@ import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.redis.utils.RedisUtils;
+import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
+import com.junoyi.framework.security.properties.SecurityProperties;
 import com.junoyi.framework.security.token.JwtTokenService;
 import com.junoyi.framework.security.token.TokenPair;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class SessionServiceImpl implements SessionService {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SessionServiceImpl.class);
     private final JwtTokenService tokenService;
+    private final SecurityProperties securityProperties;
 
     // Redis Key 前缀
     private static final String SESSION_KEY_PREFIX = "session:";
@@ -43,9 +46,15 @@ public class SessionServiceImpl implements SessionService {
      * @param loginIp   登录IP地址
      * @param userAgent 客户端标识
      * @return TokenPair 包含访问令牌和刷新令牌的对象
+     * @throws IllegalStateException 单点登录模式下，同平台已有会话时抛出
      */
     @Override
     public TokenPair login(LoginUser loginUser, String loginIp, String userAgent) {
+        // 单点登录检查
+        if (isSingleLoginEnabled()) {
+            checkSingleLogin(loginUser.getUserId(), loginUser.getPlatformType());
+        }
+
         // 创建 Token 对
         TokenPair tokenPair = tokenService.createTokenPair(loginUser);
         String tokenId = tokenPair.getTokenId();
@@ -81,15 +90,81 @@ public class SessionServiceImpl implements SessionService {
         String refreshKey = REFRESH_KEY_PREFIX + tokenId;
         RedisUtils.setCacheObject(refreshKey, loginUser.getUserId(), ttl);
 
-        // 添加到用户会话索引
-        String userSessionsKey = USER_SESSIONS_KEY_PREFIX + loginUser.getUserId();
-        RedisUtils.setCacheSet(userSessionsKey, Set.of(tokenId));
+        // 添加到用户会话索引（修复：使用 addToCacheSet 而不是 setCacheSet）
+        addToUserSessionIndex(loginUser.getUserId(), tokenId);
 
         log.info("SessionCreated", "用户登录成功 | 用户: " + loginUser.getUserName()
+                + " | 平台: " + loginUser.getPlatformType().getLabel()
                 + " | tokenId: " + tokenId.substring(0, 8) + "..."
-                + " | IP: " + loginIp);
+                + " | IP: " + loginIp
+                + " | 单点登录: " + (isSingleLoginEnabled() ? "开启" : "关闭"));
 
         return tokenPair;
+    }
+
+    /**
+     * 检查是否开启单点登录
+     */
+    private boolean isSingleLoginEnabled() {
+        return securityProperties.getToken() != null 
+                && securityProperties.getToken().isSingleLogin();
+    }
+
+    /**
+     * 单点登录检查：同一用户同一平台是否已有会话
+     */
+    private void checkSingleLogin(Long userId, PlatformType platformType) {
+        List<UserSession> existingSessions = getUserSessions(userId);
+        
+        for (UserSession session : existingSessions) {
+            if (session.getPlatformType() == platformType) {
+                log.warn("SingleLoginBlocked", "单点登录拦截 | 用户ID: " + userId 
+                        + " | 平台: " + platformType.getLabel()
+                        + " | 已有会话: " + session.getSessionId().substring(0, 8) + "...");
+                throw new IllegalStateException("该平台已有登录会话，请先退出后再登录");
+            }
+        }
+    }
+
+    /**
+     * 添加 tokenId 到用户会话索引
+     */
+    private void addToUserSessionIndex(Long userId, String tokenId) {
+        String userSessionsKey = USER_SESSIONS_KEY_PREFIX + userId;
+        Set<String> existingTokenIds = RedisUtils.getCacheSet(userSessionsKey);
+        
+        if (existingTokenIds == null) {
+            existingTokenIds = new HashSet<>();
+        } else {
+            // 创建可修改的副本
+            existingTokenIds = new HashSet<>(existingTokenIds);
+        }
+        
+        existingTokenIds.add(tokenId);
+        RedisUtils.deleteObject(userSessionsKey);
+        RedisUtils.setCacheSet(userSessionsKey, existingTokenIds);
+    }
+
+    /**
+     * 从用户会话索引中移除 tokenId
+     */
+    private void removeFromUserSessionIndex(Long userId, String tokenId) {
+        String userSessionsKey = USER_SESSIONS_KEY_PREFIX + userId;
+        Set<String> existingTokenIds = RedisUtils.getCacheSet(userSessionsKey);
+        
+        if (existingTokenIds == null || existingTokenIds.isEmpty())
+            return;
+        
+        // 创建可修改的副本
+        existingTokenIds = new HashSet<>(existingTokenIds);
+        existingTokenIds.remove(tokenId);
+        
+        if (existingTokenIds.isEmpty()) {
+            RedisUtils.deleteObject(userSessionsKey);
+        } else {
+            RedisUtils.deleteObject(userSessionsKey);
+            RedisUtils.setCacheSet(userSessionsKey, existingTokenIds);
+        }
     }
 
     /**
@@ -131,17 +206,7 @@ public class SessionServiceImpl implements SessionService {
 
         // 从用户会话索引中移除
         if (session != null) {
-            String userSessionsKey = USER_SESSIONS_KEY_PREFIX + session.getUserId();
-            Set<String> sessions = RedisUtils.getCacheSet(userSessionsKey);
-            if (sessions != null) {
-                sessions.remove(tokenId);
-                if (sessions.isEmpty()) {
-                    RedisUtils.deleteObject(userSessionsKey);
-                } else {
-                    RedisUtils.deleteObject(userSessionsKey);
-                    RedisUtils.setCacheSet(userSessionsKey, sessions);
-                }
-            }
+            removeFromUserSessionIndex(session.getUserId(), tokenId);
 
             log.info("SessionDestroyed", "用户登出成功 | 用户: " + session.getUserName()
                     + " | tokenId: " + tokenId.substring(0, 8) + "...");
