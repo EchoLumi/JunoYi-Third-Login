@@ -21,7 +21,7 @@
         <spring.boot.version>3.3.5</spring.boot.version>
 
         <bytebuddy.version>1.15.0</bytebuddy.version>
-        <mybatis-plus.version>3.5.5</mybatis-plus.version>
+        <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <druid.version>1.2.20</druid.version>
         <mysql.version>8.0.33</mysql.version>
         <lombok.version>1.18.30</lombok.version>
@@ -194,17 +194,17 @@
                 <version>${bytebuddy.version}</version>
             </dependency>
 
-            <!-- MyBatis Plus -->
+            <!-- MyBatis Plus (Spring Boot 3.x) -->
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
             <!-- MyBatis Plus 动态数据源 -->
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
                 <version>${dynamic-datasource.version}</version>
             </dependency>
 

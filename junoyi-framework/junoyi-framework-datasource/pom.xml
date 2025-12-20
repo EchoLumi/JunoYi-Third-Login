@@ -29,16 +29,16 @@
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
-        <!-- MyBatis Plus -->
+        <!-- MyBatis Plus (Spring Boot 3.x) -->
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
         </dependency>
 
-        <!-- MyBatis Plus 动态数据源 -->
+        <!-- MyBatis Plus 动态数据源 (Spring Boot 3.x) -->
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
         </dependency>
 
         <!-- Druid 连接池 -->

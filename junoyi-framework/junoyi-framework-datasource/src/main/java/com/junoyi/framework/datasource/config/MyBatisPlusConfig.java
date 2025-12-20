@@ -10,6 +10,7 @@ import com.junoyi.framework.datasource.interceptor.SlowSqlInterceptor;
 import com.junoyi.framework.datasource.properties.DataSourceProperties;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @AutoConfiguration
 @EnableTransactionManagement
 @EnableConfigurationProperties(DataSourceProperties.class)
+@MapperScan("com.junoyi.**.mapper")
 public class MyBatisPlusConfig {
 
     private final JunoYiLog log = JunoYiLogFactory.getLogger(MyBatisPlusConfig.class);

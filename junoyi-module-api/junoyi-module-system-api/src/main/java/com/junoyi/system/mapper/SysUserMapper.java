@@ -1,5 +1,7 @@
 package com.junoyi.system.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.junoyi.system.domain.po.SysUser;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -8,6 +10,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @author Fan
  */
 @Mapper
-public interface SysUserMapper {
+public interface SysUserMapper extends BaseMapper<SysUser> {
 
 }

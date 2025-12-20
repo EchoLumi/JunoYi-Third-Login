@@ -1,5 +1,8 @@
 package com.junoyi.system.domain.po;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.junoyi.framework.core.domain.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,12 +11,14 @@ import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@TableName("sys_user")
 public class SysUser extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /**
      * 用户id
      */
+    @TableId
     private Long userId;
 
     /**
@@ -71,6 +76,9 @@ public class SysUser extends BaseEntity {
      */
     private Date pwdUpdateTime;
 
-
+    /**
+     * 用户平台信息（非数据库字段）
+     */
+    @TableField(exist = false)
     private SysUserPlatform sysUserPlatform;
 }
