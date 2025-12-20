@@ -1,60 +1,70 @@
 package com.junoyi.framework.security.token;
 
-
 import com.junoyi.framework.security.module.LoginUser;
 
 /**
  * Token 业务接口类
+ * AccessToken 和 RefreshToken 逻辑关联，但生成上完全独立
  *
  * @author Fan
  */
 public interface TokenService {
 
     /**
-     * 创建访问令牌
-     * 根据登录用户信息生成访问令牌
+     * 创建 Token 对（AccessToken + RefreshToken）
+     * 两个 Token 通过 tokenId 关联，但各自独立生成
+     * 
      * @param loginUser 登录用户信息
-     * @return 访问令牌字符串
+     * @return TokenPair 包含 AccessToken 和 RefreshToken
      */
-    public String createAccessToken(LoginUser loginUser);
+    TokenPair createTokenPair(LoginUser loginUser);
 
     /**
      * 解析访问令牌
-     * 将访问令牌解析为登录用户信息
+     * 
      * @param accessToken 访问令牌字符串
      * @return 登录用户信息
      */
-    public LoginUser paresAccessToken(String accessToken);
+    LoginUser parseAccessToken(String accessToken);
 
     /**
      * 验证访问令牌
-     * 验证访问令牌的有效性
+     * 
      * @param accessToken 访问令牌字符串
-     * @return 验证结果，true表示有效，false表示无效
+     * @return 验证结果
      */
-    public boolean validateAccessToken(String accessToken);
-
-    /**
-     * 创建刷新令牌
-     * 根据登录用户信息生成刷新令牌
-     * @param loginUser 登录用户信息
-     * @return 刷新令牌字符串
-     */
-    public String createRefreshToken(LoginUser loginUser);
+    boolean validateAccessToken(String accessToken);
 
     /**
      * 解析刷新令牌
-     * 将刷新令牌解析为登录用户信息
+     * 
      * @param refreshToken 刷新令牌字符串
      * @return 登录用户信息
      */
-    public LoginUser pareRefreshToken(String refreshToken);
+    LoginUser parseRefreshToken(String refreshToken);
 
     /**
      * 验证刷新令牌
-     * 验证刷新令牌的有效性
+     * 
      * @param refreshToken 刷新令牌字符串
-     * @return 验证结果，true表示有效，false表示无效
+     * @return 验证结果
      */
-    public boolean validateRefreshToken(String refreshToken);
+    boolean validateRefreshToken(String refreshToken);
+
+    /**
+     * 使用刷新令牌刷新 Token 对
+     * 生成新的 AccessToken 和 RefreshToken（新的 tokenId）
+     * 
+     * @param refreshToken 刷新令牌字符串
+     * @return 新的 TokenPair
+     */
+    TokenPair refreshTokenPair(String refreshToken);
+
+    /**
+     * 获取 Token 中的 tokenId
+     * 
+     * @param token AccessToken 或 RefreshToken
+     * @return tokenId
+     */
+    String getTokenId(String token);
 }

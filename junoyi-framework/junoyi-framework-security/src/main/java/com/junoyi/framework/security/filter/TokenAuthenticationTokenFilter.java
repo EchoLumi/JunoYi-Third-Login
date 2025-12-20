@@ -79,7 +79,7 @@ public class TokenAuthenticationTokenFilter extends OncePerRequestFilter {
             }
 
             // 解析 Token 获取用户信息
-            LoginUser loginUser = tokenHelper.paresAccessToken(token);
+            LoginUser loginUser = tokenHelper.parseAccessToken(token);
 
             if (loginUser == null) {
                 log.warn("TokenParseError", "URI: " + requestURI);
