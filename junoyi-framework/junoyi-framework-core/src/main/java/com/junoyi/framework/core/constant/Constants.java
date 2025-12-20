@@ -7,6 +7,8 @@ package com.junoyi.framework.core.constant;
  */
 public interface Constants {
 
+    String UTF8 = "UTF-8";
+
     /**
      * Token类型常量定义
      */

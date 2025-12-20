@@ -1,6 +1,7 @@
 package com.junoyi.system.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.junoyi.framework.core.utils.ServletUtils;
 import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
@@ -13,11 +14,8 @@ import com.junoyi.system.domain.vo.AuthVo;
 import com.junoyi.system.enums.LoginType;
 import com.junoyi.system.enums.SysUserStatus;
 import com.junoyi.system.mapper.SysUserMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -55,12 +53,10 @@ public class SysAuthServiceImpl implements ISysAuthService {
         LoginUser loginUser = buildLoginUser(user);
 
         // 获取请求信息
-        HttpServletRequest request = getHttpServletRequest();
-        String loginIp = getClientIp(request);
-        String userAgent = request != null ? request.getHeader("User-Agent") : null;
+        String loginIp = ServletUtils.getClientIp();
+        String userAgent = ServletUtils.getUserAgent();
 
         // 调用 AuthService 登录（指定平台类型，自动创建会话存入 Redis）
-        // 平台类型可以从 loginRequest 中获取，或根据请求来源判断
         PlatformType platformType = loginRequest.getPlatformType() != null 
                 ? loginRequest.getPlatformType() 
                 : PlatformType.ADMIN_WEB;
@@ -175,43 +171,5 @@ public class SysAuthServiceImpl implements ISysAuthService {
         // 这里应该从数据库查询用户角色
         // return sysRoleMapper.selectRoleIdsByUserId(userId);
         return new HashSet<>();
-    }
-
-    /**
-     * 获取 HttpServletRequest
-     */
-    private HttpServletRequest getHttpServletRequest() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        return attributes != null ? attributes.getRequest() : null;
-    }
-
-    /**
-     * 获取客户端 IP
-     */
-    private String getClientIp(HttpServletRequest request) {
-        if (request == null) {
-            return null;
-        }
-
-        String ip = request.getHeader("X-Forwarded-For");
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("X-Real-IP");
-        }
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-
-        // 多个代理时取第一个 IP
-        if (ip != null && ip.contains(",")) {
-            ip = ip.split(",")[0].trim();
-        }
-
-        return ip;
     }
 }
