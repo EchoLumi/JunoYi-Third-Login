@@ -160,6 +160,8 @@ logging:
     org.springframework.context.support.PostProcessorRegistrationDelegate: ERROR
     # 屏蔽 Tomcat 内嵌 Servlet 容器初始化日志
     org.apache.catalina.core: WARN
+    # 屏蔽 MyBaits 扫描Mapper时候出现不必要的日志
+    org.mybatis.spring.mapper.ClassPathMapperScanner: ERROR
     # 屏蔽 Netty DNS 警告
     io.netty.resolver.dns: ERROR
 #    com.junoyi: DEBUG
