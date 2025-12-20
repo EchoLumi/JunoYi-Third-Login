@@ -1,5 +1,6 @@
 package com.junoyi.framework.security.service;
 
+import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.session.SessionService;
 import com.junoyi.framework.security.session.UserSession;
@@ -21,27 +22,59 @@ public class AuthServiceImpl implements AuthService {
     private final SessionService sessionService;
 
     /**
-     * 用户登录认证
+     * 用户登录认证（推荐使用）
+     *
+     * @param loginUser    登录用户信息
+     * @param platformType 登录平台类型
+     * @param loginIp      登录IP地址
+     * @param userAgent    用户代理信息
+     * @return TokenPair 访问令牌和刷新令牌对
+     */
+    @Override
+    public TokenPair login(LoginUser loginUser, PlatformType platformType, String loginIp, String userAgent) {
+        // 设置平台类型
+        loginUser.setPlatformType(platformType);
+        return sessionService.login(loginUser, loginIp, userAgent);
+    }
+
+    /**
+     * 用户登录认证（简化版，只传平台类型）
+     *
+     * @param loginUser    登录用户信息
+     * @param platformType 登录平台类型
+     * @return TokenPair 访问令牌和刷新令牌对
+     */
+    @Override
+    public TokenPair login(LoginUser loginUser, PlatformType platformType) {
+        return login(loginUser, platformType, null, null);
+    }
+
+    /**
+     * 用户登录认证（使用默认平台 ADMIN_WEB）
      *
      * @param loginUser 登录用户信息
-     * @param loginIp 登录IP地址
+     * @param loginIp   登录IP地址
      * @param userAgent 用户代理信息
      * @return TokenPair 访问令牌和刷新令牌对
      */
     @Override
     public TokenPair login(LoginUser loginUser, String loginIp, String userAgent) {
-        return sessionService.login(loginUser, loginIp, userAgent);
+        // 如果 loginUser 中已设置 platformType 则使用，否则默认 ADMIN_WEB
+        PlatformType platform = loginUser.getPlatformType() != null 
+                ? loginUser.getPlatformType() 
+                : PlatformType.ADMIN_WEB;
+        return login(loginUser, platform, loginIp, userAgent);
     }
 
     /**
-     * 用户登录认证（简化版）
+     * 用户登录认证（最简版）
      *
      * @param loginUser 登录用户信息
      * @return TokenPair 访问令牌和刷新令牌对
      */
     @Override
     public TokenPair login(LoginUser loginUser) {
-        return sessionService.login(loginUser, null, null);
+        return login(loginUser, PlatformType.ADMIN_WEB, null, null);
     }
 
     /**

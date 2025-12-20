@@ -436,10 +436,11 @@ public class JwtTokenService implements TokenService {
      */
     private String getPlatformKey(PlatformType platformType) {
         return switch (platformType) {
-            case ADMIN_WEB, FRONT_DESK_WEB -> "web";
-            case MINI_PROGRAM -> "miniprogram";
-            case APP -> "app";
-            case DESKTOP_APP -> "desktop";
+            case ADMIN_WEB -> "admin-web";           // 后台管理 Web
+            case FRONT_DESK_WEB -> "front-web";     // 前台用户 Web
+            case MINI_PROGRAM -> "miniprogram";     // 小程序
+            case APP -> "app";                       // App
+            case DESKTOP_APP -> "desktop";           // 桌面应用
         };
     }
 

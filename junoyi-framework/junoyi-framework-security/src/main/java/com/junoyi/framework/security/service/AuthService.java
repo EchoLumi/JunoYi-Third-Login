@@ -1,5 +1,6 @@
 package com.junoyi.framework.security.service;
 
+import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.session.UserSession;
 import com.junoyi.framework.security.token.TokenPair;
@@ -15,12 +16,13 @@ import java.util.List;
 public interface AuthService {
 
     /**
-     * 用户登录
+     * 用户登录（推荐使用）
      * 业务模块验证密码后，调用此方法创建会话
      * 
-     * @param loginUser 登录用户信息（必须包含 userId、userName、platformType）
-     * @param loginIp   登录IP（可选，可传 null）
-     * @param userAgent 用户代理（可选，可传 null）
+     * @param loginUser    登录用户信息（必须包含 userId、userName）
+     * @param platformType 登录平台类型（决定 Token 有效期）
+     * @param loginIp      登录IP（可选，可传 null）
+     * @param userAgent    用户代理（可选，可传 null）
      * @return TokenPair 包含 accessToken 和 refreshToken
      * 
      * @example
@@ -33,22 +35,40 @@ public interface AuthService {
      *     .userId(user.getId())
      *     .userName(user.getUsername())
      *     .nickName(user.getNickname())
-     *     .platformType(PlatformType.ADMIN_WEB)
      *     .permissions(user.getPermissions())
      *     .roles(user.getRoleIds())
      *     .build();
      * 
-     * // 3. 调用登录
-     * TokenPair tokenPair = authService.login(loginUser, request.getRemoteAddr(), request.getHeader("User-Agent"));
+     * // 3. 调用登录（指定平台类型）
+     * TokenPair tokenPair = authService.login(loginUser, PlatformType.ADMIN_WEB, loginIp, userAgent);
      * 
      * // 4. 返回给前端
      * return Result.ok(tokenPair);
      * </pre>
      */
+    TokenPair login(LoginUser loginUser, PlatformType platformType, String loginIp, String userAgent);
+
+    /**
+     * 简化登录（只传平台类型）
+     * 
+     * @param loginUser    登录用户信息
+     * @param platformType 登录平台类型
+     * @return TokenPair
+     */
+    TokenPair login(LoginUser loginUser, PlatformType platformType);
+
+    /**
+     * 简化登录（使用默认平台 ADMIN_WEB）
+     * 
+     * @param loginUser 登录用户信息
+     * @param loginIp   登录IP
+     * @param userAgent 用户代理
+     * @return TokenPair
+     */
     TokenPair login(LoginUser loginUser, String loginIp, String userAgent);
 
     /**
-     * 简化登录（不传 IP 和 UserAgent）
+     * 最简登录（使用默认平台 ADMIN_WEB，不传 IP 和 UserAgent）
      * 
      * @param loginUser 登录用户信息
      * @return TokenPair

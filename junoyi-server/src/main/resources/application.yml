@@ -134,18 +134,20 @@ junoyi:
       header: Authorization
       # 令牌密钥 (HS512 算法要求至少 64 字符)
       secret: fd5K48pq6pyZaBoYk56mGiEWVM4qcX0k9PHRjunoyi2025SecureTokenKeyForHS512Algorithm
-      # Access Token 有效期
+      # Access Token 有效期（不同平台不同有效期）
       access-expire:
-        web: 30m
-        miniprogram: 12h
-        app: 24h
-        desktop: 7d
+        admin-web: 30m      # 后台管理 Web（安全要求高，有效期短）
+        front-web: 2h       # 前台用户 Web（用户体验优先，有效期稍长）
+        miniprogram: 12h    # 小程序
+        app: 24h            # App
+        desktop: 7d         # 桌面应用
       # Refresh Token 有效期
       refresh-expire:
-        web: 7d
-        miniprogram: 30d
-        app: 30d
-        desktop: 90d
+        admin-web: 7d       # 后台管理 Web
+        front-web: 14d      # 前台用户 Web
+        miniprogram: 30d    # 小程序
+        app: 30d            # App
+        desktop: 90d        # 桌面应用
 
 
 # Spring Boot服务器配置

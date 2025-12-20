@@ -1,6 +1,7 @@
 package com.junoyi.system.domain.dto;
 
 
+import com.junoyi.framework.security.enums.PlatformType;
 import lombok.Data;
 
 /**
@@ -45,4 +46,11 @@ public class LoginRequest {
      * 短信或邮件验证码，用于二次验证
      */
     private String code;
+
+    /**
+     * 登录平台类型
+     * 用于区分不同平台的登录，决定 Token 有效期
+     * 可选值：ADMIN_WEB(后台)、FRONT_DESK_WEB(前台)、MINI_PROGRAM(小程序)、APP、DESKTOP_APP(桌面)
+     */
+    private PlatformType platformType;
 }

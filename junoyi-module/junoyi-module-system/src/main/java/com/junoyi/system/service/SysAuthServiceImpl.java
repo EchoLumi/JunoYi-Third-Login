@@ -59,8 +59,12 @@ public class SysAuthServiceImpl implements ISysAuthService {
         String loginIp = getClientIp(request);
         String userAgent = request != null ? request.getHeader("User-Agent") : null;
 
-        // 调用 AuthService 登录（自动创建会话存入 Redis）
-        TokenPair tokenPair = authService.login(loginUser, loginIp, userAgent);
+        // 调用 AuthService 登录（指定平台类型，自动创建会话存入 Redis）
+        // 平台类型可以从 loginRequest 中获取，或根据请求来源判断
+        PlatformType platformType = loginRequest.getPlatformType() != null 
+                ? loginRequest.getPlatformType() 
+                : PlatformType.ADMIN_WEB;
+        TokenPair tokenPair = authService.login(loginUser, platformType, loginIp, userAgent);
 
         // 构建返回结果
         AuthVo authVo = new AuthVo();
@@ -136,7 +140,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
     }
 
     /**
-     * 构建 LoginUser
+     * 构建 LoginUser（不再设置 platformType，由 login 参数传入）
      */
     private LoginUser buildLoginUser(SysUser user) {
         // TODO: 从数据库查询用户权限和角色
@@ -147,7 +151,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
                 .userId(user.getUserId())
                 .userName(user.getUserName())
                 .nickName(user.getNickName())
-                .platformType(PlatformType.ADMIN_WEB)  // 可以从请求中判断平台类型
+                // platformType 不在这里设置，由 authService.login() 参数传入
                 .permissions(permissions)
                 .roles(roles)
                 .build();
