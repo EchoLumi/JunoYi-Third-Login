@@ -57,13 +57,13 @@ public class ApiEncryptFilter extends OncePerRequestFilter {
             HttpServletRequest wrappedRequest = request;
             HttpServletResponse wrappedResponse = response;
 
-            // 1. 处理请求体解密（如果启用）
+            // 处理请求体解密（如果启用）
             if (securityProperties.getApiEncrypt().isRequest() && needDecryptRequest(request)) {
                 wrappedRequest = decryptRequest(request);
                 log.info("RequestDecrypted", "请求体已解密: " + requestURI);
             }
 
-            // 2. 处理响应体加密（如果启用）
+            // 处理响应体加密（如果启用）
             if (securityProperties.getApiEncrypt().isResponse() && needEncryptResponse(request)) {
                 wrappedResponse = wrapResponseForEncryption(response);
                 log.info("ResponseWrapped", "响应体将被加密: " + requestURI);
