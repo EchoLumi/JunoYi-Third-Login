@@ -12,6 +12,24 @@ public interface CacheConstants {
      */
     String PREFIX = "junoyi:";
 
+    // ==================== 登录相关 ====================
+
+    /**
+     * 平台登录失败次数
+     * 完整 Key: junoyi:login:fail:{platformType}:{username}
+     * Value: 失败次数
+     * TTL: 冷却时间（例如5分钟、10分钟）
+     */
+    String LOGIN_FAIL = PREFIX + "login:fail:";
+
+    /**
+     * 平台登录错误IP限制模式
+     * 完整 Key: junoyi:login:fail:ip:{ip}
+     * Value: 失败次数
+     * TTL: ip冷却时间
+     */
+    String LOGIN_FAIL_IP = PREFIX + "login:fail:ip:";
+
     // ==================== 会话相关 ====================
 
     /**

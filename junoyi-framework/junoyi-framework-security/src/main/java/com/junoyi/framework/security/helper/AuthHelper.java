@@ -157,4 +157,22 @@ public interface AuthHelper {
      * @return 踢出的会话数量
      */
     int kickOutAll(Long userId);
+
+    /**
+     * 处理登录失败事件
+     * @param account 登录失败的账户名
+     * @param platformType 登录的平台类型
+     * @param ip 登录失败时的客户端IP地址
+     * @return 如果返回true账号/IP已经锁定需要等待冷却，返回false就还能尝试登录
+     */
+    public boolean onLoginFail(String account,PlatformType platformType, String ip);
+
+    /**
+     * 处理登录成功事件
+     * @param account 登录成功的账户名
+     * @param platformType 登录成功的平台类型
+     * @param ip 登录成功的ip
+     */
+    void onLoginSuccess(String account,PlatformType platformType, String ip);
+
 }

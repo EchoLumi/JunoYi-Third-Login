@@ -27,6 +27,11 @@ public class SecurityProperties {
     private List<String> whitelist;
 
     /**
+     * Login登录配置信息，包括最大登录失败次数，是否启用ip限制
+     */
+    private Login login;
+
+    /**
      * Token配置信息，包括令牌相关参数设置
      */
     private Token token;
@@ -50,6 +55,37 @@ public class SecurityProperties {
          * 是否对响应数据进行加密
          */
         private boolean response;
+    }
+
+    /**
+     * Login配置内部类，用于设置最大登录失败次数，是否启用ip限制
+     */
+    @Data
+    public static class Login {
+        /**
+         * 最大登录失败次数
+         */
+        private int maxFailCount;
+
+        /**
+         * 登录失败冷却时间
+         */
+        private int failCollDownMinutes;
+
+        /**
+         * 是否启用 ip 限制模式
+         */
+        private boolean enableIpLimit;
+
+        /**
+         * ip 限制最大失败次数
+         */
+        private int ipMaxFailCount;
+
+        /**
+         * ip限制冷却时间
+         */
+        private int ipFailCollDownMinutes;
     }
 
     /**

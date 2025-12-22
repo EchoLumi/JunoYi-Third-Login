@@ -1,13 +1,21 @@
 package com.junoyi.framework.security.helper;
 
+import com.junoyi.framework.log.core.JunoYiLog;
+import com.junoyi.framework.log.core.JunoYiLogFactory;
+import com.junoyi.framework.redis.utils.RedisUtils;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.security.module.LoginUser;
 import com.junoyi.framework.security.module.UserSession;
 import com.junoyi.framework.security.module.TokenPair;
+import com.junoyi.framework.security.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
+
+import static com.junoyi.framework.core.constant.CacheConstants.LOGIN_FAIL;
+import static com.junoyi.framework.core.constant.CacheConstants.LOGIN_FAIL_IP;
 
 /**
  * 认证服务助手实现
@@ -18,8 +26,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthHelperImpl implements AuthHelper {
 
-    private final SessionHelper sessionHelper;
+    private final JunoYiLog log = JunoYiLogFactory.getLogger(AuthHelperImpl.class);
 
+    private final SessionHelper sessionHelper;
+    private final SecurityProperties securityProperties;
     /**
      * 用户登录认证（推荐使用）
      *
@@ -186,5 +196,73 @@ public class AuthHelperImpl implements AuthHelper {
     public int kickOutAll(Long userId) {
         return sessionHelper.kickOutAll(userId);
     }
+
+
+    /**
+     * 获取账户登录失败次数的Redis键值
+     * @param account 账户名
+     * @param platformType 平台类型
+     * @return 返回格式为 LOGIN_FAIL + platformType.getCode() + ":" + account 的键值字符串
+     */
+    private String getAccountKey(String account, PlatformType platformType){
+        return LOGIN_FAIL + platformType.getCode() + ":" + account;
+    }
+
+    /**
+     * 获取IP登录失败次数的Redis键值
+     * @param ip IP地址
+     * @return 返回格式为 LOGIN_FAIL_IP + ip 的键值字符串
+     */
+    private String getIpKey(String ip){
+        return LOGIN_FAIL_IP + ip;
+    }
+
+
+    /**
+     * 处理登录失败事件
+     * @param account 登录失败的账户名
+     * @param platformType 登录的平台类型
+     * @param ip 登录失败时的客户端IP地址
+     * @return 如果返回true账号/IP已经锁定需要等待冷却，返回false就还能尝试登录
+     */
+    @Override
+    public boolean onLoginFail(String account,PlatformType platformType, String ip){
+        // 获取账号错误次数
+        String accountKey = getAccountKey(account,platformType);
+        Integer accountFailCount = (Integer) RedisUtils.getCacheObject(accountKey);
+
+        accountFailCount = accountFailCount == null ? 1 : accountFailCount ++;
+
+        if (accountFailCount >= securityProperties.getLogin().getMaxFailCount()){
+            log.info("", "账号超过登录次数，进入登录冷却");
+
+            RedisUtils.setCacheObject(accountKey, accountFailCount,
+                    Duration.ofMinutes(securityProperties.getLogin().getFailCollDownMinutes()));
+
+        }
+
+        // IP限制模式
+        if (securityProperties.getLogin().isEnableIpLimit()){
+
+        }
+
+        return false;
+    }
+
+    /**
+     * 处理登录成功事件
+     * @param account 登录成功的账户名
+     * @param platformType 登录成功的平台类型
+     * @param ip 登录成功的ip
+     */
+    @Override
+    public void onLoginSuccess(String account,PlatformType platformType,String ip) {
+        RedisUtils.deleteKeys(getAccountKey(account,platformType));
+        if (securityProperties.getLogin().isEnableIpLimit()){
+
+        }
+    }
+
+
 }
 

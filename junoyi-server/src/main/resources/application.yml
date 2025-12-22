@@ -133,6 +133,19 @@ junoyi:
       - /auth/login
       - /auth/register
       - /system/info
+    # 登录机制
+    login:
+      # 最大登录失败次数
+      max-fail-count: 5
+      # 登录失败冷却时间（分钟）
+      fail-coll-down-minutes: 5
+      # 是否启用 ip 限制模式
+      enable-ip-limit: true
+      # ip限制最大失败次数
+      ip-max-fail-count: 20
+      # ip限制冷却时间
+      ip_fail_coll_down-minutes: 30
+    # token 机制
     token:
       header: Authorization
       # 令牌密钥 (HS512 算法要求至少 64 字符)
