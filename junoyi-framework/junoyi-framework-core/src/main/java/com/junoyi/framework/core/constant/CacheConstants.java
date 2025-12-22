@@ -1,10 +1,37 @@
 package com.junoyi.framework.core.constant;
 
 /**
- * 缓存键标识符
+ * 缓存键常量
  *
  * @author Fan
  */
 public interface CacheConstants {
 
+    /**
+     * 缓存键前缀
+     */
+    String PREFIX = "junoyi:";
+
+    // ==================== 会话相关 ====================
+
+    /**
+     * RefreshToken 有效性标记
+     * 完整 Key: junoyi:refresh:{tokenId}
+     * Value: 用户ID，用于验证 RefreshToken 是否有效、是否被撤销
+     */
+    String REFRESH_TOKEN = PREFIX + "refresh:";
+
+    /**
+     * 用户会话信息
+     * 完整 Key: junoyi:session:{tokenId}
+     * Value: UserSession 对象，包含完整用户信息、权限、角色、过期时间等
+     */
+    String SESSION = PREFIX + "session:";
+
+    /**
+     * 用户的所有会话列表
+     * 完整 Key: junoyi:user:sessions:{userId}
+     * Value: Set<String> 集合，存储该用户所有的 tokenId，用于"踢人下线"、"查看在线设备"
+     */
+    String USER_SESSIONS = PREFIX + "user:sessions:";
 }

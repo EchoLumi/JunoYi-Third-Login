@@ -16,13 +16,15 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.junoyi.framework.core.constant.CacheConstants.*;
+
 /**
  * 会话服务助手实现类
  *
  * Redis 存储结构：
- * 1. session:{tokenId}     -> UserSession（会话详情）
- * 2. refresh:{tokenId}     -> userId（RefreshToken 白名单）
- * 3. user:sessions:{userId} -> Set<tokenId>（用户会话索引）
+ * 1. junoyi:session:{tokenId}       -> UserSession（会话详情）
+ * 2. junoyi:refresh:{tokenId}       -> userId（RefreshToken 白名单）
+ * 3. junoyi:user:sessions:{userId}  -> Set<tokenId>（用户会话索引）
  *
  * @author Fan
  */
@@ -33,11 +35,6 @@ public class SessionHelperImpl implements SessionHelper {
     private final JunoYiLog log = JunoYiLogFactory.getLogger(SessionHelperImpl.class);
     private final JwtTokenHelper tokenService;
     private final SecurityProperties securityProperties;
-
-    // Redis Key 前缀
-    private static final String SESSION_KEY_PREFIX = "session:";
-    private static final String REFRESH_KEY_PREFIX = "refresh:";
-    private static final String USER_SESSIONS_KEY_PREFIX = "user:sessions:";
 
     /**
      * 用户登录并创建新的会话
@@ -83,11 +80,11 @@ public class SessionHelperImpl implements SessionHelper {
         Duration ttl = Duration.ofMillis(ttlMillis);
 
         // 存储会话到 Redis
-        String sessionKey = SESSION_KEY_PREFIX + tokenId;
+        String sessionKey = SESSION + tokenId;
         RedisUtils.setCacheObject(sessionKey, session, ttl);
 
         // 存储 RefreshToken 白名单
-        String refreshKey = REFRESH_KEY_PREFIX + tokenId;
+        String refreshKey = REFRESH_TOKEN + tokenId;
         RedisUtils.setCacheObject(refreshKey, loginUser.getUserId(), ttl);
 
         // 添加到用户会话索引（修复：使用 addToCacheSet 而不是 setCacheSet）
@@ -130,7 +127,7 @@ public class SessionHelperImpl implements SessionHelper {
      * 添加 tokenId 到用户会话索引
      */
     private void addToUserSessionIndex(Long userId, String tokenId) {
-        String userSessionsKey = USER_SESSIONS_KEY_PREFIX + userId;
+        String userSessionsKey = USER_SESSIONS + userId;
         Set<String> existingTokenIds = RedisUtils.getCacheSet(userSessionsKey);
         
         if (existingTokenIds == null) {
@@ -149,7 +146,7 @@ public class SessionHelperImpl implements SessionHelper {
      * 从用户会话索引中移除 tokenId
      */
     private void removeFromUserSessionIndex(Long userId, String tokenId) {
-        String userSessionsKey = USER_SESSIONS_KEY_PREFIX + userId;
+        String userSessionsKey = USER_SESSIONS + userId;
         Set<String> existingTokenIds = RedisUtils.getCacheSet(userSessionsKey);
         
         if (existingTokenIds == null || existingTokenIds.isEmpty())
@@ -197,11 +194,11 @@ public class SessionHelperImpl implements SessionHelper {
         UserSession session = getSessionByTokenId(tokenId);
 
         // 删除会话
-        String sessionKey = SESSION_KEY_PREFIX + tokenId;
+        String sessionKey = SESSION + tokenId;
         RedisUtils.deleteObject(sessionKey);
 
         // 删除 RefreshToken 白名单
-        String refreshKey = REFRESH_KEY_PREFIX + tokenId;
+        String refreshKey = REFRESH_TOKEN + tokenId;
         RedisUtils.deleteObject(refreshKey);
 
         // 从用户会话索引中移除
@@ -241,7 +238,7 @@ public class SessionHelperImpl implements SessionHelper {
         if (StringUtils.isBlank(tokenId))
             return null;
 
-        String sessionKey = SESSION_KEY_PREFIX + tokenId;
+        String sessionKey = SESSION + tokenId;
         return RedisUtils.getCacheObject(sessionKey);
     }
 
@@ -288,7 +285,7 @@ public class SessionHelperImpl implements SessionHelper {
             throw new IllegalArgumentException("无法解析 RefreshToken");
 
         // 检查 RefreshToken 是否在白名单中（是否被主动失效）
-        String refreshKey = REFRESH_KEY_PREFIX + oldTokenId;
+        String refreshKey = REFRESH_TOKEN + oldTokenId;
         if (!RedisUtils.isExistsObject(refreshKey))
             throw new IllegalArgumentException("RefreshToken 已被撤销");
 
@@ -346,7 +343,7 @@ public class SessionHelperImpl implements SessionHelper {
         session.setLastAccessTime(new Date());
 
         // 保存到 Redis（保留原 TTL）
-        String sessionKey = SESSION_KEY_PREFIX + tokenId;
+        String sessionKey = SESSION + tokenId;
         RedisUtils.setCacheObject(sessionKey, session, true);
 
         log.info("SessionUpdated", "会话更新成功 | 用户: " + loginUser.getUserName()
@@ -366,7 +363,7 @@ public class SessionHelperImpl implements SessionHelper {
         if (userId == null)
             return Collections.emptyList();
 
-        String userSessionsKey = USER_SESSIONS_KEY_PREFIX + userId;
+        String userSessionsKey = USER_SESSIONS + userId;
         Set<String> tokenIds = RedisUtils.getCacheSet(userSessionsKey);
 
         if (tokenIds == null || tokenIds.isEmpty())
@@ -443,7 +440,7 @@ public class SessionHelperImpl implements SessionHelper {
         if (StringUtils.isBlank(tokenId))
             return false;
 
-        String sessionKey = SESSION_KEY_PREFIX + tokenId;
+        String sessionKey = SESSION + tokenId;
         return RedisUtils.isExistsObject(sessionKey);
     }
 
@@ -460,7 +457,7 @@ public class SessionHelperImpl implements SessionHelper {
         UserSession session = getSessionByTokenId(tokenId);
         if (session != null) {
             session.setLastAccessTime(new Date());
-            String sessionKey = SESSION_KEY_PREFIX + tokenId;
+            String sessionKey = SESSION + tokenId;
             RedisUtils.setCacheObject(sessionKey, session, true);
         }
     }
