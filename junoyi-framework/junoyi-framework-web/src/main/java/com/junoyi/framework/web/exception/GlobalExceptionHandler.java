@@ -1,33 +1,126 @@
 package com.junoyi.framework.web.exception;
 
+import com.junoyi.framework.core.constant.HttpStatus;
 import com.junoyi.framework.core.domain.base.BaseException;
 import com.junoyi.framework.core.domain.module.R;
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.nio.file.AccessDeniedException;
 
 /**
  * 全局异常处理类
- *
- * 该类用于统一处理应用程序中抛出的异常，提供全局的异常捕获和处理机制。
- * 通过使用@RestControllerAdvice注解，可以捕获所有控制器层抛出的异常，
- * 并返回统一格式的错误响应给客户端。
  *
  * @author Fan
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     /**
-     * 基础通用异常处理
-     * @param e BaseException 异常对象
-     * @return R<?> 返回封装的异常响应结果
+     * 业务异常
      */
     @ExceptionHandler(BaseException.class)
-    public R<?> handleBaseException(BaseException e) {
-        // 处理基础异常，返回失败响应
+    public R<?> handleBaseException(BaseException e, HttpServletRequest request) {
+        log.warn("[业务异常] 请求地址: {}, 异常信息: {}", request.getRequestURI(), e.getMessage());
         return R.fail(e.getCode(), e.getMessage());
     }
 
+    /**
+     * 权限校验异常
+     * TODO:
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public R<?> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
+        log.warn("[权限异常] 请求地址: {}, 异常信息: {}", request.getRequestURI(), e.getMessage());
+        return R.fail(HttpStatus.FORBIDDEN, "没有权限访问该资源");
+    }
 
+    /**
+     * 请求方式不支持
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public R<?> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
+        log.warn("[请求方式错误] 请求地址: {}, 不支持 {} 请求", request.getRequestURI(), e.getMethod());
+        return R.fail(HttpStatus.BAD_METHOD, "不支持 " + e.getMethod() + " 请求");
+    }
 
+    /**
+     * 请求路径不存在
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public R<?> handleNoHandlerFoundException(NoResourceFoundException e, HttpServletRequest request) {
+        log.warn("[路径不存在] 请求地址: {}", request.getRequestURI());
+        return R.fail(HttpStatus.NOT_FOUND, "请求路径不存在");
+    }
+
+    /**
+     * 参数校验异常 - @Valid 校验失败
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public R<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        FieldError fieldError = e.getBindingResult().getFieldError();
+        String message = fieldError != null ? fieldError.getDefaultMessage() : "参数校验失败";
+        log.warn("[参数校验失败] {}", message);
+        return R.fail(HttpStatus.BAD_REQUEST, message);
+    }
+
+    /**
+     * 参数绑定异常
+     */
+    @ExceptionHandler(BindException.class)
+    public R<?> handleBindException(BindException e) {
+        FieldError fieldError = e.getBindingResult().getFieldError();
+        String message = fieldError != null ? fieldError.getDefaultMessage() : "参数绑定失败";
+        log.warn("[参数绑定失败] {}", message);
+        return R.fail(HttpStatus.BAD_REQUEST, message);
+    }
+
+    /**
+     * 缺少请求参数
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public R<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        log.warn("[缺少参数] 参数名: {}", e.getParameterName());
+        return R.fail(HttpStatus.BAD_REQUEST, "缺少必要参数: " + e.getParameterName());
+    }
+
+    /**
+     * 参数类型不匹配
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public R<?> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        log.warn("[参数类型错误] 参数名: {}, 期望类型: {}", e.getName(), e.getRequiredType());
+        return R.fail(HttpStatus.BAD_REQUEST, "参数类型错误: " + e.getName());
+    }
+
+    /**
+     * 运行时异常
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public R<?> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
+        log.error("[运行时异常] 请求地址: {}, 异常信息: {}", request.getRequestURI(), e.getMessage(), e);
+        return R.fail("系统异常，请稍后重试");
+    }
+
+    /**
+     * 系统异常 - 兜底处理
+     */
+    @ExceptionHandler(Exception.class)
+    public R<?> handleException(Exception e, HttpServletRequest request) {
+        log.error("[系统异常] 请求地址: {}, 异常信息: {}", request.getRequestURI(), e.getMessage(), e);
+        return R.fail("系统繁忙，请稍后重试");
+    }
 }

@@ -11,7 +11,7 @@ import com.junoyi.framework.core.domain.base.BaseException;
 public class AuthException extends BaseException {
 
     /**
-     * 构造函数1，创建一个认证异常实例
+     * 构造函数 创建一个认证异常实例
      * @param code 异常码
      * @param message 异常信息描述
      * @param domain 异常当前领域
