@@ -9,6 +9,7 @@ import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,4 +51,16 @@ public class TestController {
     public R<String> helloWorldDesktop() {
         return R.ok();
     }
+
+    @GetMapping("/xss")
+    public R<?> testXss(){
+        return R.ok();
+    }
+
+    @PostMapping("/xss")
+    public R<?> testXss2(){
+        return R.ok();
+    }
+
+
 }

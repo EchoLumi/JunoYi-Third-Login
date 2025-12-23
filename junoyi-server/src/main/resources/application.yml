@@ -120,7 +120,9 @@ junoyi:
   web:
     xss:
       # 过滤模式: clean（清理危险内容) / escape(转义特殊字符) / reject(拒绝请求)
-      mode: clean  # clean / escape / reject
+      # 生产环境建议使用 reject模式，clean模式会清除xss攻击内容，但是请求任何会传给controller继续执行，
+      # reject 模式
+      mode: reject  # clean / escape / reject
       # 是否过滤参数
       filter-parameter: true
       # 是否过滤请求头
@@ -154,6 +156,7 @@ junoyi:
       - /auth/login
       - /auth/register
       - /system/info
+      - /demo/**
     # 登录机制
     login:
       # 最大登录失败次数

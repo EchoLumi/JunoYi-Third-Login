@@ -2,6 +2,8 @@ package com.junoyi.framework.web.config;
 
 import com.junoyi.framework.web.filter.XssFilter;
 import com.junoyi.framework.web.properties.XssProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -17,12 +19,15 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(XssProperties.class)
 public class WebConfiguration {
 
+    private static final Logger log = LoggerFactory.getLogger(WebConfiguration.class);
+
     /**
      * XSS 过滤器
      */
     @Bean
-    @ConditionalOnProperty(prefix = "xss", name = "enable", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "junoyi.web.xss", name = "enable", havingValue = "true", matchIfMissing = true)
     public FilterRegistrationBean<XssFilter> xssFilterRegistration(XssProperties xssProperties) {
+        log.info("[XSS] XSS过滤器已启用, 模式: {}", xssProperties.getMode());
         FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new XssFilter(xssProperties));
         registration.addUrlPatterns("/*");
