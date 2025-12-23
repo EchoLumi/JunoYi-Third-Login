@@ -17,5 +17,4 @@ public class BaseController {
      */
     protected final JunoYiLog log = JunoYiLogFactory.getLogger(this.getClass());
 
-
 }
