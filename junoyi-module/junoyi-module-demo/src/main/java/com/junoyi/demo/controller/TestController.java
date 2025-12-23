@@ -8,10 +8,7 @@ import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/demo")
@@ -58,7 +55,7 @@ public class TestController {
     }
 
     @PostMapping("/xss")
-    public R<?> testXss2(){
+    public R<?> testXss2(@RequestParam Long id){
         return R.ok();
     }
 

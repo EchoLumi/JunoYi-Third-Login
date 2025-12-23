@@ -34,7 +34,7 @@ public class WebConfiguration {
         registration.setFilter(new XssFilter(xssProperties));
         registration.addUrlPatterns("/*");
         registration.setName("xssFilter");
-        registration.setOrder(1);
+        registration.setOrder(2); // 在 SQL 注入过滤器之后执行
         return registration;
     }
 
@@ -49,7 +49,7 @@ public class WebConfiguration {
         registration.setFilter(new SqlInjectionFilter(properties));
         registration.addUrlPatterns("/*");
         registration.setName("sqlInjectionFilter");
-        registration.setOrder(2); // 在 XSS 过滤器之后执行
+        registration.setOrder(1); // 先执行 SQL 注入检测
         return registration;
     }
 }

@@ -78,16 +78,19 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
 
             // 检测请求体（需要包装请求）
             if (properties.isFilterBody() && hasRequestBody(request)) {
-                SqlInjectionHttpServletRequestWrapper wrappedRequest = new SqlInjectionHttpServletRequestWrapper(request, properties);
-                byte[] body = wrappedRequest.getOriginalBody();
+                // 读取请求体
+                byte[] body = request.getInputStream().readAllBytes();
                 if (body != null && body.length > 0) {
                     String bodyStr = new String(body, StandardCharsets.UTF_8);
+                    log.debug("[SQL注入防护] 检测请求体: {}", bodyStr);
                     if (SqlInjectionUtils.containsSqlInjection(bodyStr)) {
                         log.warn("[SQL注入拦截] 请求地址: {}, 请求体包含 SQL 注入", request.getRequestURI());
                         rejectRequest(response);
                         return;
                     }
                 }
+                // 创建包装器以便后续读取
+                SqlInjectionHttpServletRequestWrapper wrappedRequest = new SqlInjectionHttpServletRequestWrapper(request, properties, body);
                 filterChain.doFilter(wrappedRequest, response);
                 return;
             }

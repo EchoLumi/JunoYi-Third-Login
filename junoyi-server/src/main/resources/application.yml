@@ -43,7 +43,7 @@ junoyi:
       # 根日志级别
       root: INFO
       # JunoYi 框架日志级别（设置为 DEBUG 以查看所有日志）
-      junoyi: INFO
+      junoyi: DEBUG
       # Spring 框架日志级别
       spring: WARN
       # MyBatis 日志级别
@@ -123,6 +123,8 @@ junoyi:
 
     # XSS 攻击防护
     xss:
+      # 是否启用 XSS 过滤
+      enable: true
       # 过滤模式: clean（清理危险内容) / escape(转义特殊字符) / reject(拒绝请求)
       # 生产环境建议使用 reject模式，clean模式会清除xss攻击内容，但是请求任何会传给controller继续执行，
       # reject 模式
@@ -133,8 +135,6 @@ junoyi:
       filter-header: true
       # 是否过滤请求体
       filter-body: true
-      # 是否启用 XSS 过滤
-      enable: true
       # 排除的 URL 路径（支持 Ant 风格）
       exclude-urls:
         - /test
@@ -144,8 +144,11 @@ junoyi:
 
     # SQL 注入严格防护
     sql-injection:
+      # 是否启用
       enable: true
-      mode: detect  # detect(检测并拒绝) / clean(清理)
+      # 防护模式：detect(检测并拒绝) / clean(清理)
+      mode: detect
+      # 排除的 URL 路径（支持 Ant 风格）
       filter-parameter: true
       filter-header: false
       filter-body: true

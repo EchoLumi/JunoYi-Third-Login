@@ -35,6 +35,15 @@ public class SqlInjectionHttpServletRequestWrapper extends HttpServletRequestWra
         }
     }
 
+    /**
+     * 使用已读取的请求体创建包装器
+     */
+    public SqlInjectionHttpServletRequestWrapper(HttpServletRequest request, SQLInjectionProperties properties, byte[] body) {
+        super(request);
+        this.properties = properties;
+        this.body = body;
+    }
+
     @Override
     public String getParameter(String name) {
         if (!properties.isFilterParameter()) return super.getParameter(name);
