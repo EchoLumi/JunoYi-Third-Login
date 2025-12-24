@@ -178,6 +178,36 @@ junoyi:
       custom-keywords:
         - xp_cmdshell
 
+  # ==================== 验证码配置 ====================
+  captcha:
+    # 是否启用验证码
+    enable: true
+    # 默认验证码类型: IMAGE(图片) / SLIDER(滑块) / CLICK(点选)
+    type: IMAGE
+    # 验证码过期时间（秒）
+    expire-seconds: 120
+    # 图片验证码配置
+    image:
+      # 验证码长度
+      length: 4
+      # 图片宽度
+      width: 130
+      # 图片高度
+      height: 48
+      # 干扰线数量
+      line-count: 5
+      # 验证码类型: math(数学运算) / char(字符)
+      code-type: char
+    # 滑块验证码配置
+    slider:
+      # 滑块容差值（像素）
+      tolerance: 5
+    # 点选验证码配置
+    click:
+      # 需要点击的文字数量
+      word-count: 4
+      # 点击容差值（像素）
+      tolerance: 10
 
   # ==================== 安全验证配置 ====================
   security:

@@ -1,9 +1,7 @@
 package com.junoyi.system.controller;
 
-import com.junoyi.framework.captcha.enums.CaptchaType;
 import com.junoyi.framework.core.domain.base.BaseController;
 import com.junoyi.framework.core.domain.module.R;
-import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.system.domain.dto.LoginRequest;
 import com.junoyi.system.domain.vo.AuthVo;
 import com.junoyi.system.service.ISysAuthService;

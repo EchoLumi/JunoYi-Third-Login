@@ -1,39 +1,25 @@
 package com.junoyi.framework.captcha.enums;
 
 /**
- * 验证码类型
+ * 验证码类型枚举
  *
  * @author Fan
  */
 public enum CaptchaType {
-
     /**
-     * 图片验证码
+     * 图片验证码 - 传统数字/字母验证码
      */
     IMAGE,
-
     /**
-     * 滑块验证码
+     * 滑块验证码 - 拖动滑块到指定位置
      */
     SLIDER,
-
     /**
-     * 点击验证码
+     * 点选验证码 - 按顺序点击指定文字
      */
     CLICK,
-
     /**
-     * 行为验证码
+     * 行为验证码 - 基于用户行为分析
      */
-    BEHAVIOR,
-
-    /**
-     * 邮箱验证码
-     */
-    EMAIL,
-
-    /**
-     * 手机号验证码
-     */
-    SMS;
+    BEHAVIOR
 }

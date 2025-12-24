@@ -4,10 +4,7 @@ import com.junoyi.framework.captcha.enums.CaptchaScene;
 import com.junoyi.framework.captcha.enums.CaptchaType;
 import com.junoyi.framework.core.domain.module.R;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  *
@@ -35,6 +32,9 @@ public class SysCaptchaController {
         return R.ok();
     }
 
-
+    @PostMapping("/send")
+    public R<?> sendCaptchaMessage(){
+        return R.ok();
+    }
 
 }
