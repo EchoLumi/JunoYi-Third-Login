@@ -1,6 +1,5 @@
 package com.junoyi.framework.captcha.generator;
 
-import cn.hutool.captcha.generator.MathGenerator;
 import cn.hutool.core.util.IdUtil;
 import com.junoyi.framework.captcha.domain.CaptchaResult;
 import com.junoyi.framework.captcha.enums.CaptchaType;
@@ -53,11 +52,11 @@ public class ImageCaptchaGenerator implements CaptchaGenerator {
         String code;
 
         if ("math".equalsIgnoreCase(config.getCodeType())) {
-            MathGenerator mathGenerator = new MathGenerator(1);
-            code = mathGenerator.generate();
-            String answer = calculateMathExpression(code);
+            // 自定义数学表达式，保证结果在0-100之间且不为负数
+            String[] mathResult = generateMathExpression();
+            code = mathResult[0];
+            String answer = mathResult[1];
             captchaStore.save(captchaId, answer, properties.getExpireSeconds());
-            code = code + "=?";
         } else {
             code = generateRandomCode(config.getLength());
             captchaStore.save(captchaId, code.toLowerCase(), properties.getExpireSeconds());
@@ -236,6 +235,41 @@ public class ImageCaptchaGenerator implements CaptchaGenerator {
     }
 
     /**
+     * 生成数学表达式
+     * 规则：两个运算数都是个位数(1-9)，结果在0-99之间
+     * @return [表达式, 答案]
+     */
+    private String[] generateMathExpression() {
+        int type = random.nextInt(3); // 0=加法, 1=减法, 2=乘法
+        int a, b, result;
+        String expression;
+
+        switch (type) {
+            case 0: // 加法: 两个个位数相加，结果最大18
+                a = random.nextInt(9) + 1;  // 1-9
+                b = random.nextInt(9) + 1;  // 1-9
+                result = a + b;
+                expression = a + "+" + b + "=?";
+                break;
+            case 1: // 减法: 保证 a >= b，结果不为负
+                a = random.nextInt(9) + 1;  // 1-9
+                b = random.nextInt(a) + 1;  // 1 到 a
+                result = a - b;
+                expression = a + "-" + b + "=?";
+                break;
+            case 2: // 乘法: 两个个位数相乘，结果最大81
+            default:
+                a = random.nextInt(9) + 1;  // 1-9
+                b = random.nextInt(9) + 1;  // 1-9
+                result = a * b;
+                expression = a + "×" + b + "=?";
+                break;
+        }
+
+        return new String[]{expression, String.valueOf(result)};
+    }
+
+    /**
      * 获取随机浅色（用于干扰元素）
      */
     private Color getRandomLightColor() {
@@ -244,26 +278,5 @@ public class ImageCaptchaGenerator implements CaptchaGenerator {
                 150 + random.nextInt(100),
                 150 + random.nextInt(100)
         );
-    }
-
-    /**
-     * 计算数学表达式
-     */
-    private String calculateMathExpression(String expression) {
-        try {
-            String exp = expression.replace("=", "").trim();
-            if (exp.contains("+")) {
-                String[] parts = exp.split("\\+");
-                return String.valueOf(Integer.parseInt(parts[0].trim()) + Integer.parseInt(parts[1].trim()));
-            } else if (exp.contains("-")) {
-                String[] parts = exp.split("-");
-                return String.valueOf(Integer.parseInt(parts[0].trim()) - Integer.parseInt(parts[1].trim()));
-            } else if (exp.contains("*") || exp.contains("×")) {
-                String[] parts = exp.split("[*×]");
-                return String.valueOf(Integer.parseInt(parts[0].trim()) * Integer.parseInt(parts[1].trim()));
-            }
-        } catch (Exception ignored) {
-        }
-        return "0";
     }
 }

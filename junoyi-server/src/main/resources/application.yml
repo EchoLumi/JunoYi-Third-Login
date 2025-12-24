@@ -205,7 +205,7 @@ junoyi:
       # 字体大小
       font-size: 32
       # 验证码类型: math(数学运算) / char(字符)
-      code-type: char
+      code-type: math
     # 滑块验证码配置
     slider:
       # 滑块容差值（像素）
