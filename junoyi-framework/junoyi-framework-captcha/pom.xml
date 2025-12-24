@@ -13,7 +13,7 @@
     <artifactId>junoyi-framework-captcha</artifactId>
 
     <description>
-        人机验证(验证码)核心模块 - 支持图片验证码，可扩展滑块/点选验证码
+        人机验证(验证码)核心模块 - 支持图片验证码、滑块/点选验证码
     </description>
 
     <dependencies>
