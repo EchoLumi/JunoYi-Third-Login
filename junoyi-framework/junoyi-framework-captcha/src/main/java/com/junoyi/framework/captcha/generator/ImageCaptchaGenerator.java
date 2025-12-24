@@ -67,7 +67,8 @@ public class ImageCaptchaGenerator implements CaptchaGenerator {
         return new CaptchaResult()
                 .setCaptchaId(captchaId)
                 .setType(CaptchaType.IMAGE)
-                .setImage("data:image/png;base64," + imageBase64)
+//                .setImage("data:image/png;base64," + imageBase64)
+                .setImage(imageBase64)
                 .setExpireSeconds(properties.getExpireSeconds());
     }
 
