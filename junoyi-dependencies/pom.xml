@@ -18,7 +18,7 @@
         <!-- 项目版本 -->
         <revision>0.0.8-alpha</revision>
         <!-- 统一依赖版本号 -->
-        <spring.boot.version>3.3.5</spring.boot.version>
+        <spring.boot.version>3.5.0</spring.boot.version>
 
         <bytebuddy.version>1.15.0</bytebuddy.version>
         <mybatis-plus.version>3.5.7</mybatis-plus.version>

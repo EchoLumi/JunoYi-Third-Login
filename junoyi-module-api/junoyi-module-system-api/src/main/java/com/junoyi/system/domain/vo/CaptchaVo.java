@@ -4,7 +4,6 @@ package com.junoyi.system.domain.vo;
 import com.junoyi.framework.captcha.enums.CaptchaType;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 验证码值对象类
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
  */
 @Data
 @Builder
-@RequiredArgsConstructor
 public class CaptchaVo {
     /**
      * 验证码唯一标识符
