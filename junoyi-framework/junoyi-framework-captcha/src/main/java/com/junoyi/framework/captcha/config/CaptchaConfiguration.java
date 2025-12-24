@@ -61,8 +61,8 @@ public class CaptchaConfiguration {
     @ConditionalOnMissingBean(CaptchaService.class)
     public CaptchaService captchaService(CaptchaProperties captchaProperties) {
         CaptchaProperties.SliderCaptcha slider = captchaProperties.getSlider();
-        log.info("[Captcha] AJ-Captcha service initialized, waterMark: {}, tolerance: {}",
-                slider.getWaterMark(), slider.getTolerance());
+        log.info("[Captcha] AJ-Captcha service initialized, waterMark: {}, tolerance: {}, size: {}x{}",
+                slider.getWaterMark(), slider.getTolerance(), slider.getWidth(), slider.getHeight());
 
         Properties props = new Properties();
         props.setProperty("captcha.type", "blockPuzzle");
@@ -70,6 +70,9 @@ public class CaptchaConfiguration {
         props.setProperty("captcha.slip.offset", String.valueOf(slider.getTolerance()));
         props.setProperty("captcha.aes.status", String.valueOf(slider.isAesStatus()));
         props.setProperty("captcha.interference.options", String.valueOf(slider.getInterferenceOptions()));
+        // 设置背景图尺寸
+        props.setProperty("captcha.image.width", String.valueOf(slider.getWidth()));
+        props.setProperty("captcha.image.height", String.valueOf(slider.getHeight()));
 
         return CaptchaServiceFactory.getInstance(props);
     }

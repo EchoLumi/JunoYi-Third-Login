@@ -35,6 +35,18 @@ public class CaptchaResult implements Serializable {
      */
     private String sliderImage;
     /**
+     * 滑块验证码 - 滑块Y坐标（垂直位置）
+     */
+    private Integer sliderY;
+    /**
+     * 滑块验证码 - 背景图宽度
+     */
+    private Integer backgroundWidth;
+    /**
+     * 滑块验证码 - 背景图高度
+     */
+    private Integer backgroundHeight;
+    /**
      * 点选验证码 - 原始图片 Base64
      */
     private String originalImage;

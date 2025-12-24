@@ -64,11 +64,20 @@ public class SliderCaptchaGenerator implements CaptchaGenerator {
         // 存储AJ-Captcha的token，用于后续验证
         captchaStore.save(captchaId, data.getToken(), properties.getExpireSeconds());
 
+        // 获取滑块Y坐标（从point中提取）
+        Integer sliderY = null;
+        if (data.getPoint() != null) {
+            sliderY = data.getPoint().y;
+        }
+
         return new CaptchaResult()
                 .setCaptchaId(captchaId)
                 .setType(CaptchaType.SLIDER)
                 .setBackgroundImage(data.getOriginalImageBase64())
                 .setSliderImage(data.getJigsawImageBase64())
+                .setSliderY(sliderY)
+                .setBackgroundWidth(properties.getSlider().getWidth())
+                .setBackgroundHeight(properties.getSlider().getHeight())
                 .setExpireSeconds(properties.getExpireSeconds());
     }
 
