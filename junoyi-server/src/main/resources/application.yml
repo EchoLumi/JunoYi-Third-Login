@@ -194,8 +194,16 @@ junoyi:
       width: 150
       # 图片高度
       height: 50
-      # 干扰圆圈数量 (适中即可，太多会看不清)
-      circle-count: 20
+      # 干扰线数量
+      line-count: 4
+      # 干扰圆圈数量
+      circle-count: 15
+      # 扭曲程度 (0-1, 0=不扭曲, 1=最大扭曲, 推荐0.2-0.4)
+      distortion: 0.3
+      # 噪点数量
+      noise-count: 50
+      # 字体大小
+      font-size: 32
       # 验证码类型: math(数学运算) / char(字符)
       code-type: char
     # 滑块验证码配置
