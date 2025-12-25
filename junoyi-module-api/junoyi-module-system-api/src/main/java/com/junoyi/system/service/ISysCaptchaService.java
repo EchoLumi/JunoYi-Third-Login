@@ -15,17 +15,8 @@ public interface ISysCaptchaService {
     CaptchaResult getImageCaptcha();
 
     /**
-     * 获取滑块验证码
-     */
-    CaptchaResult getSliderCaptcha();
-
-    /**
      * 校验图片验证码
      */
     boolean validate(String captchaId, String code);
 
-    /**
-     * 校验滑块验证码
-     */
-    boolean validateSlider(String captchaId, String pointJson);
 }

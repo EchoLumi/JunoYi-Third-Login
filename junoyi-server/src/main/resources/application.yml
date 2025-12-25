@@ -183,7 +183,7 @@ junoyi:
   captcha:
     # 是否启用验证码
     enable: true
-    # 默认验证码类型: IMAGE(图片) / SLIDER(滑块) / CLICK(点选)
+    # 默认验证码类型: IMAGE(图片)
     type: IMAGE
     # 验证码过期时间（秒）
     expire-seconds: 120
@@ -207,22 +207,6 @@ junoyi:
       font-size: 32
       # 验证码类型: math(数学运算) / char(字符)
       code-type: math
-    # 滑块验证码配置
-    slider:
-      # 滑块容差值（像素）
-      tolerance: 5
-      # 水印文字
-      water-mark: JunoYi
-      # 是否启用AES加密
-      aes-status: true
-      # 干扰项数量 (0-2)
-      interference-options: 0
-    # 点选验证码配置
-    click:
-      # 需要点击的文字数量
-      word-count: 4
-      # 点击容差值（像素）
-      tolerance: 10
 
   # ==================== 安全验证配置 ====================
   security:

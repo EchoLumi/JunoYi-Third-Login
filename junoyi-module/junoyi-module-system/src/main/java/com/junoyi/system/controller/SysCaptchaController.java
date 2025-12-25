@@ -28,14 +28,6 @@ public class SysCaptchaController {
     }
 
     /**
-     * 获取滑块验证码
-     */
-    @GetMapping("/slider")
-    public R<CaptchaResult> getSliderCaptcha() {
-        return R.ok(captchaService.getSliderCaptcha());
-    }
-
-    /**
      * 校验图片验证码
      */
     @PostMapping("/validate")
@@ -43,13 +35,4 @@ public class SysCaptchaController {
         return R.ok(captchaService.validate(captchaId, code));
     }
 
-    /**
-     * 校验滑块验证码
-     * @param captchaId 验证码ID
-     * @param pointJson 滑块坐标JSON，格式: {"x":100,"y":5}
-     */
-    @PostMapping("/validate/slider")
-    public R<Boolean> validateSlider(@RequestParam("captchaId") String captchaId, @RequestParam("pointJson") String pointJson) {
-        return R.ok(captchaService.validateSlider(captchaId, pointJson));
-    }
 }

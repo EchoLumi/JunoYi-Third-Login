@@ -28,14 +28,7 @@ public class CaptchaProperties {
      * 图片验证码配置
      */
     private ImageCaptcha image = new ImageCaptcha();
-    /**
-     * 滑块验证码配置
-     */
-    private SliderCaptcha slider = new SliderCaptcha();
-    /**
-     * 点选验证码配置
-     */
-    private ClickCaptcha click = new ClickCaptcha();
+
 
     @Data
     public static class ImageCaptcha {
@@ -74,46 +67,8 @@ public class CaptchaProperties {
         /**
          * 验证码类型: math(数学运算), char(字符)
          */
-        private String codeType = "char";
+        private String codeType = "math";
     }
 
-    @Data
-    public static class SliderCaptcha {
-        /**
-         * 滑块容差值 (像素)
-         */
-        private int tolerance = 5;
-        /**
-         * 背景图片宽度
-         */
-        private int width = 310;
-        /**
-         * 背景图片高度
-         */
-        private int height = 155;
-        /**
-         * 水印文字
-         */
-        private String waterMark = "JunoYi";
-        /**
-         * 是否启用AES加密
-         */
-        private boolean aesStatus = true;
-        /**
-         * 干扰项数量 (0-2)
-         */
-        private int interferenceOptions = 0;
-    }
 
-    @Data
-    public static class ClickCaptcha {
-        /**
-         * 需要点击的文字数量
-         */
-        private int wordCount = 4;
-        /**
-         * 点击容差值 (像素)
-         */
-        private int tolerance = 10;
-    }
 }

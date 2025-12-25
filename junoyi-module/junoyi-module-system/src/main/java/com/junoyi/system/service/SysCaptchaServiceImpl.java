@@ -22,18 +22,10 @@ public class SysCaptchaServiceImpl implements ISysCaptchaService {
         return captchaHelper.generate(CaptchaType.IMAGE);
     }
 
-    @Override
-    public CaptchaResult getSliderCaptcha() {
-        return captchaHelper.generate(CaptchaType.SLIDER);
-    }
 
     @Override
     public boolean validate(String captchaId, String code) {
         return captchaHelper.validate(captchaId, code);
     }
 
-    @Override
-    public boolean validateSlider(String captchaId, String pointJson) {
-        return captchaHelper.validateSlider(captchaId, pointJson);
-    }
 }

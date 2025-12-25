@@ -70,19 +70,6 @@ public class CaptchaHelperImpl implements CaptchaHelper {
         return generator.validate(captchaId, code);
     }
 
-    /**
-     * 验证滑块/点选验证码
-     *
-     * @param captchaId 验证码ID
-     * @param pointJson 坐标JSON
-     * @return 验证结果
-     */
-    @Override
-    public boolean validateSlider(String captchaId, String pointJson) {
-        if (captchaId == null || pointJson == null) return false;
-        CaptchaGenerator generator = getGenerator(CaptchaType.SLIDER);
-        return generator.validate(captchaId, pointJson);
-    }
 
     /**
      * 根据验证码类型获取对应的生成器
