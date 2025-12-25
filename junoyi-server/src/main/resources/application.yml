@@ -281,7 +281,7 @@ junoyi:
     super-admin:
       enable: true
       user-ids: [1]
-      permission: *
+      permission: "*"
     # 默认权限组(新用户默认权限组)
     default-groups:
       - guest
