@@ -1,5 +1,6 @@
 package com.junoyi.demo.controller;
 
+import com.junoyi.demo.domain.UserInfoVO;
 import com.junoyi.demo.event.TestEvent;
 import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.event.core.EventBus;
@@ -10,6 +11,8 @@ import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/demo")
@@ -65,5 +68,28 @@ public class TestController {
     @PlatformScope(PlatformType.APP)
     public R<String> testPermission(){
         return R.ok("Hello World");
+    }
+
+    /**
+     * 测试字段权限
+     * <p>
+     * 根据用户权限返回不同的字段值：
+     * - 有 field.user.xxx 权限：显示完整值
+     * - 无权限但配置了脱敏：显示脱敏值
+     * - 无权限且未配置脱敏：显示 null
+     */
+    @GetMapping("/field-permission")
+    public R<UserInfoVO> testFieldPermission() {
+        UserInfoVO user = new UserInfoVO();
+        user.setId(1L);
+        user.setUsername("zhangsan");
+        user.setNickName("张三");
+        user.setPhone("13812345678");
+        user.setIdCard("110101199001011234");
+        user.setEmail("zhangsan@example.com");
+        user.setSalary(new BigDecimal("15000.00"));
+        user.setBankCard("6222021234567890123");
+        user.setAddress("北京市朝阳区建国路100号");
+        return R.ok(user);
     }
 }
