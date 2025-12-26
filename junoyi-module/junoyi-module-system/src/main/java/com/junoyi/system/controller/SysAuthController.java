@@ -21,8 +21,6 @@ public class SysAuthController extends BaseController {
 
     private final ISysAuthService sysAuthService;
 
-
-
     /**
      * 用户登录接口
      * 处理用户登录请求，验证用户身份并返回认证结果
