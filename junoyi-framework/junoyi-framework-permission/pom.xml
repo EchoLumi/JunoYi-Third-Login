@@ -36,6 +36,12 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Jackson（字段权限序列化） -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
         <!--    junoyi core核心模块    -->
         <dependency>
             <groupId>com.junoyi</groupId>
