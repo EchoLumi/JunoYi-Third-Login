@@ -78,7 +78,7 @@ public class FieldPermissionSerializer extends JsonSerializer<Object> {
         }
 
         // 无权限，返回 null
-        log.warn("No permission {}, returning null.", readPermission);
+        log.debug("No permission {}, returning null.", readPermission);
         gen.writeNull();
     }
 }
