@@ -11,7 +11,7 @@
  Target Server Version : 80404 (8.4.4)
  File Encoding         : 65001
 
- Date: 25/12/2025 20:42:22
+ Date: 26/12/2025 08:18:22
 */
 
 SET NAMES utf8mb4;
@@ -78,6 +78,7 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
   `user_id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `dept_id` bigint DEFAULT NULL COMMENT '部门ID',
   `user_name` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户账号',
   `nick_name` varchar(100) DEFAULT NULL COMMENT '用户昵称',
   `avatar` varchar(255) DEFAULT NULL COMMENT '头像',
@@ -101,7 +102,7 @@ CREATE TABLE `sys_user` (
 -- Records of sys_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, 'admin', '超级管理员', NULL, 'exmple@junoyi.com', '18899887878', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'system', '2025-12-05 08:13:00', 'system', '2025-12-05 08:13:17', '超级管理员');
+INSERT INTO `sys_user` (`user_id`, `dept_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, NULL, 'admin', '超级管理员', NULL, 'exmple@junoyi.com', '18899887878', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'system', '2025-12-05 08:13:00', 'system', '2025-12-05 08:13:17', '超级管理员');
 COMMIT;
 
 -- ----------------------------
