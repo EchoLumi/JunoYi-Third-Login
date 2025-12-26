@@ -11,11 +11,26 @@
  Target Server Version : 80404 (8.4.4)
  File Encoding         : 65001
 
- Date: 26/12/2025 08:18:22
+ Date: 26/12/2025 09:09:03
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for sys_dept
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_dept`;
+CREATE TABLE `sys_dept` (
+  `dept_id` bigint NOT NULL AUTO_INCREMENT COMMENT '部门主键ID',
+  PRIMARY KEY (`dept_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统部门权限表';
+
+-- ----------------------------
+-- Records of sys_dept
+-- ----------------------------
+BEGIN;
+COMMIT;
 
 -- ----------------------------
 -- Table structure for sys_perm_group
@@ -29,7 +44,7 @@ CREATE TABLE `sys_perm_group` (
   `priority` int DEFAULT NULL COMMENT '优先级（数值越大优先级越高）',
   `description` varchar(500) DEFAULT NULL COMMENT '权限组描述',
   `status` int DEFAULT '1' COMMENT '状态（0停用，1启用）',
-  `permission` text COMMENT '权限标识符',
+  `permissions` json DEFAULT NULL COMMENT '权限列表',
   `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `update_by` varchar(64) DEFAULT NULL COMMENT '更新者',
@@ -96,13 +111,35 @@ CREATE TABLE `sys_user` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `remark` text COMMENT '备注',
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user` (`user_id`, `dept_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, NULL, 'admin', '超级管理员', NULL, 'exmple@junoyi.com', '18899887878', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'system', '2025-12-05 08:13:00', 'system', '2025-12-05 08:13:17', '超级管理员');
+INSERT INTO `sys_user` (`user_id`, `dept_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, 1, 'super_admin', '超级管理员', NULL, 'exmple@junoyi.com', '18899887878', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'system', '2025-12-05 08:13:00', 'system', '2025-12-05 08:13:17', '超级管理员');
+INSERT INTO `sys_user` (`user_id`, `dept_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, 1, 'admin', '用户管理员', NULL, 'admin@junoyi.com', '18899887877', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'super_admin', '2025-12-26 08:22:32', 'super_admin', '2025-12-26 08:22:43', '用户管理员');
+INSERT INTO `sys_user` (`user_id`, `dept_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (3, 2, 'user1', '钧逸用户1', NULL, 'user1@junoyi.com', '18899887876', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'admin', '2025-12-26 09:02:10', 'admin', '2025-12-26 09:02:15', '钧逸用户');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_user_group
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user_group`;
+CREATE TABLE `sys_user_group` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `group_id` bigint NOT NULL COMMENT '权限组ID',
+  `expire_time` datetime DEFAULT NULL COMMENT '过期时间（支持临时授权）',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_group` (`user_id`,`group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户-权限组关联表';
+
+-- ----------------------------
+-- Records of sys_user_group
+-- ----------------------------
+BEGIN;
 COMMIT;
 
 -- ----------------------------
@@ -124,6 +161,26 @@ CREATE TABLE `sys_user_other_auth` (
 
 -- ----------------------------
 -- Records of sys_user_other_auth
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_user_perm
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user_perm`;
+CREATE TABLE `sys_user_perm` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `permission` varchar(200) NOT NULL COMMENT '权限节点',
+  `expire_time` datetime DEFAULT NULL COMMENT '过期时间',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_perm` (`user_id`,`permission`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户独立权限表';
+
+-- ----------------------------
+-- Records of sys_user_perm
 -- ----------------------------
 BEGIN;
 COMMIT;
