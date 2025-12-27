@@ -222,4 +222,37 @@ public class SysAuthServiceImpl implements ISysAuthService {
         return new HashSet<>();
     }
 
+    /**
+     * 获取用户信息
+     * @param loginUser 用户会话信息
+     * @return 返回用户信息
+     */
+    public UserInfoVo getUserInfo(LoginUser loginUser){
+        Long userId = loginUser.getUserId();
+
+        LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysUser::isDelFlag, false)
+                .eq(SysUser::getUserId, userId)
+                .select(SysUser::getAvatar, SysUser::getEmail);
+        SysUser sysUser = sysUserMapper.selectOne(wrapper);
+        String avatar = sysUser.getAvatar();
+        if (avatar == null || avatar.isBlank()) {
+            // 未设置头像返回默认头像
+            avatar = "/default-avatar.png";
+        }
+
+        Set<String> userPermissions = getUserPermissions(userId);
+        Set<Long> userRoles = getUserRoles(userId);
+
+        return UserInfoVo.builder()
+                .userId(userId)
+                .userName(loginUser.getUserName())
+                .nickName(loginUser.getNickName())
+                .email(sysUser.getEmail())
+                .avatar(avatar)
+                .permissions(userPermissions)
+                .roles(userRoles)
+                .build();
+    }
+
 }

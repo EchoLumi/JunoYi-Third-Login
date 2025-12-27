@@ -98,7 +98,6 @@ public class SysAuthController extends BaseController {
     @GetMapping("/info")
     public R<UserInfoVo> getUserInfo() {
         LoginUser loginUser = getLoginUser();
-
-        return R.ok();
+        return R.ok(sysAuthService.getUserInfo(loginUser));
     }
 }

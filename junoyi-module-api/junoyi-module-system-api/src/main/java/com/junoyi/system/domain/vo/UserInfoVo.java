@@ -4,7 +4,7 @@ package com.junoyi.system.domain.vo;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * 用户信息 vo 数据实体
@@ -44,11 +44,11 @@ public class UserInfoVo {
     /**
      * 权限列表
      */
-    private List<String> permissions;
+    private Set<String> permissions;
 
     /**
      * 角色
      */
-    private List<Long> roles;
+    private Set<Long> roles;
 
 }
