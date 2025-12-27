@@ -1,5 +1,4 @@
-package com.junoyi.framework.core.domain.base;
-
+package com.junoyi.framework.web.domain;
 
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
@@ -19,12 +18,11 @@ public class BaseController {
      */
     protected final JunoYiLog log = JunoYiLogFactory.getLogger(this.getClass());
 
-
     /**
      * 获取当前登录的用户
      * @return 返回 LoginUser 对象
      */
-    protected LoginUser getLoginUser(){
+    protected LoginUser getLoginUser() {
         return SecurityUtils.getLoginUser();
     }
 
@@ -32,7 +30,7 @@ public class BaseController {
      * 获取当前登录用户的用户名
      * @return 返回用户名字符串
      */
-    protected String getUserName(){
+    protected String getUserName() {
         return SecurityUtils.getUserName();
     }
 
@@ -40,7 +38,7 @@ public class BaseController {
      * 获取当前登录用户的昵称
      * @return 返回昵称字符串
      */
-    protected String getNickName(){
+    protected String getNickName() {
         return SecurityUtils.getNickName();
     }
 
@@ -48,8 +46,7 @@ public class BaseController {
      * 获取当前登录用户的ID
      * @return 返回用户ID的Long类型值
      */
-    protected Long getUserId(){
+    protected Long getUserId() {
         return SecurityUtils.getUserId();
     }
-
 }

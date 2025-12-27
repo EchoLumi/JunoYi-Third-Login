@@ -28,6 +28,11 @@
 
         <dependency>
             <groupId>com.junoyi</groupId>
+            <artifactId>junoyi-framework-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.junoyi</groupId>
             <artifactId>junoyi-framework-permission</artifactId>
             <optional>true</optional>
         </dependency>

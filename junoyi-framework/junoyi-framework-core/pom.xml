@@ -89,12 +89,6 @@
             <artifactId>mapstruct</artifactId>
         </dependency>
 
-        <!--    安全模块    -->
-        <dependency>
-            <groupId>com.junoyi</groupId>
-            <artifactId>junoyi-framework-security</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>

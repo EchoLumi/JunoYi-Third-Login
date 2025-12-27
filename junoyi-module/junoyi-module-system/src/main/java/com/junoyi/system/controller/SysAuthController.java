@@ -1,7 +1,7 @@
 package com.junoyi.system.controller;
 
 import com.junoyi.framework.captcha.helper.CaptchaHelper;
-import com.junoyi.framework.core.domain.base.BaseController;
+import com.junoyi.framework.web.domain.BaseController;
 import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.core.exception.captcha.CaptchaExpiredException;
 import com.junoyi.framework.core.exception.captcha.CaptchaInvalidException;
