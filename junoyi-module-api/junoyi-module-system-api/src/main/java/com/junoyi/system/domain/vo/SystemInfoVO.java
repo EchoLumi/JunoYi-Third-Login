@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class SystemInfoVo {
+public class SystemInfoVO {
 
     /**
      * 系统名

@@ -19,7 +19,7 @@ import com.junoyi.system.domain.bo.LoginBO;
 import com.junoyi.system.domain.po.LoginIdentity;
 import com.junoyi.system.domain.po.SysUser;
 import com.junoyi.system.domain.vo.AuthVo;
-import com.junoyi.system.domain.vo.UserInfoVo;
+import com.junoyi.system.domain.vo.UserInfoVO;
 import com.junoyi.system.enums.LoginType;
 import com.junoyi.system.enums.SysUserStatus;
 import com.junoyi.system.mapper.SysUserMapper;
@@ -237,7 +237,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
      * @param loginUser 用户会话信息
      * @return 返回用户信息
      */
-    public UserInfoVo getUserInfo(LoginUser loginUser){
+    public UserInfoVO getUserInfo(LoginUser loginUser){
         Long userId = loginUser.getUserId();
 
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
@@ -255,7 +255,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
         Set<Long> userRoles = getUserRoles(userId);
         Set<Long> userDept = getUserDept(userId);
 
-        return UserInfoVo.builder()
+        return UserInfoVO.builder()
                 .userId(userId)
                 .userName(loginUser.getUserName())
                 .nickName(loginUser.getNickName())

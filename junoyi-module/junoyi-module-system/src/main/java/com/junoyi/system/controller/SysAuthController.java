@@ -13,7 +13,7 @@ import com.junoyi.system.convert.LoginConverter;
 import com.junoyi.system.domain.dto.LoginDTO;
 import com.junoyi.system.domain.bo.LoginBO;
 import com.junoyi.system.domain.vo.AuthVo;
-import com.junoyi.system.domain.vo.UserInfoVo;
+import com.junoyi.system.domain.vo.UserInfoVO;
 import com.junoyi.system.service.ISysAuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +96,7 @@ public class SysAuthController extends BaseController {
      * @return R<UserInfoVo> 统一响应结果，包含用户信息数据
      */
     @GetMapping("/info")
-    public R<UserInfoVo> getUserInfo() {
+    public R<UserInfoVO> getUserInfo() {
         LoginUser loginUser = getLoginUser();
         return R.ok(sysAuthService.getUserInfo(loginUser));
     }

@@ -14,7 +14,7 @@ import java.util.Set;
  */
 @Data
 @Builder
-public class UserInfoVo {
+public class UserInfoVO {
 
     /**
      * 用户 ID

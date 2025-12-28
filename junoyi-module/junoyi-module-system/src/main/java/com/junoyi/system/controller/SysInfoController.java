@@ -4,7 +4,7 @@ import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.core.properties.JunoYiProperties;
-import com.junoyi.system.domain.vo.SystemInfoVo;
+import com.junoyi.system.domain.vo.SystemInfoVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +35,8 @@ public class SysInfoController {
      * 获取系统信息
      */
     @GetMapping
-    public R<SystemInfoVo> getSystemInfo(){
-        SystemInfoVo systemInfoVo = SystemInfoVo.builder()
+    public R<SystemInfoVO> getSystemInfo(){
+        SystemInfoVO systemInfoVo = SystemInfoVO.builder()
                 .name(junoYiProperties.getName())
                 .version(junoYiProperties.getVersion())
                 .copyrightYear(junoYiProperties.getCopyrightYear())
