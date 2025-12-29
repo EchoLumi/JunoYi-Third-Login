@@ -11,7 +11,7 @@
  Target Server Version : 80404 (8.4.4)
  File Encoding         : 65001
 
- Date: 28/12/2025 17:37:23
+ Date: 29/12/2025 15:22:07
 */
 
 SET NAMES utf8mb4;
@@ -28,6 +28,25 @@ CREATE TABLE `sys_dept` (
 
 -- ----------------------------
 -- Records of sys_dept
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_dept_group
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_dept_group`;
+CREATE TABLE `sys_dept_group` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `dept_id` bigint DEFAULT NULL COMMENT '部门ID',
+  `group_id` bigint DEFAULT NULL COMMENT '权限组ID',
+  `expire_time` datetime DEFAULT NULL COMMENT '过期时间（临时权限）',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='部门-权限组关联表';
+
+-- ----------------------------
+-- Records of sys_dept_group
 -- ----------------------------
 BEGIN;
 COMMIT;
@@ -147,7 +166,7 @@ DROP TABLE IF EXISTS `sys_perm_group`;
 CREATE TABLE `sys_perm_group` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `group_code` varchar(50) DEFAULT NULL COMMENT '权限组编码',
-  `group_name` int DEFAULT NULL COMMENT '权限组名称',
+  `group_name` varchar(50) DEFAULT NULL COMMENT '权限组名称',
   `parent_id` bigint DEFAULT NULL COMMENT '父权限组（支持继承）',
   `priority` int DEFAULT NULL COMMENT '优先级（数值越大优先级越高）',
   `description` varchar(500) DEFAULT NULL COMMENT '权限组描述',
@@ -196,18 +215,20 @@ INSERT INTO `sys_role` (`id`, `role_name`, `role_key`, `sort`, `data_scope`, `st
 COMMIT;
 
 -- ----------------------------
--- Table structure for sys_role_menu
+-- Table structure for sys_role_group
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_role_menu`;
-CREATE TABLE `sys_role_menu` (
+DROP TABLE IF EXISTS `sys_role_group`;
+CREATE TABLE `sys_role_group` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `role_id` bigint DEFAULT NULL COMMENT '角色ID',
-  `menu_id` bigint DEFAULT NULL COMMENT '菜单ID',
+  `group_id` bigint DEFAULT NULL COMMENT '权限组ID',
+  `expire_time` datetime DEFAULT NULL COMMENT '过期时间（临时权限组使用）',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='系统角色菜单关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='角色-权限组关联表';
 
 -- ----------------------------
--- Records of sys_role_menu
+-- Records of sys_role_group
 -- ----------------------------
 BEGIN;
 COMMIT;
@@ -218,7 +239,6 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_user`;
 CREATE TABLE `sys_user` (
   `user_id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `dept_id` bigint DEFAULT NULL COMMENT '部门ID',
   `user_name` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户账号',
   `nick_name` varchar(100) DEFAULT NULL COMMENT '用户昵称',
   `avatar` varchar(255) DEFAULT NULL COMMENT '头像',
@@ -242,9 +262,26 @@ CREATE TABLE `sys_user` (
 -- Records of sys_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user` (`user_id`, `dept_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, 1, 'super_admin', '超级管理员', NULL, 'exmple@junoyi.com', '18899887878', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'system', '2025-12-05 08:13:00', 'system', '2025-12-05 08:13:17', '超级管理员');
-INSERT INTO `sys_user` (`user_id`, `dept_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, 1, 'admin', '用户管理员', NULL, 'admin@junoyi.com', '18899887877', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'super_admin', '2025-12-26 08:22:32', 'super_admin', '2025-12-26 08:22:43', '用户管理员');
-INSERT INTO `sys_user` (`user_id`, `dept_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (3, 2, 'user1', '钧逸用户1', NULL, 'user1@junoyi.com', '18899887876', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'admin', '2025-12-26 09:02:10', 'admin', '2025-12-26 09:02:15', '钧逸用户');
+INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (1, 'super_admin', '超级管理员', NULL, 'exmple@junoyi.com', '18899887878', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'system', '2025-12-05 08:13:00', 'system', '2025-12-05 08:13:17', '超级管理员');
+INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (2, 'admin', '用户管理员', NULL, 'admin@junoyi.com', '18899887877', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'super_admin', '2025-12-26 08:22:32', 'super_admin', '2025-12-26 08:22:43', '用户管理员');
+INSERT INTO `sys_user` (`user_id`, `user_name`, `nick_name`, `avatar`, `email`, `phonenumber`, `sex`, `password`, `salt`, `status`, `del_flag`, `pwd_update_time`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (3, 'user1', '钧逸用户1', NULL, 'user1@junoyi.com', '18899887876', '1', 'm/ctuGNjUwrpOxdqrd2fQsfVN1Mnbu6EKwJWXN+P3W4=', '3dvSoCjGtCXZnSB+6ENWtQ==', 1, 0, NULL, 'admin', '2025-12-26 09:02:10', 'admin', '2025-12-26 09:02:15', '钧逸用户');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_user_dept
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user_dept`;
+CREATE TABLE `sys_user_dept` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint DEFAULT NULL COMMENT '用户ID',
+  `dept_id` bigint DEFAULT NULL COMMENT '部门ID',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户-部门关联表';
+
+-- ----------------------------
+-- Records of sys_user_dept
+-- ----------------------------
+BEGIN;
 COMMIT;
 
 -- ----------------------------
