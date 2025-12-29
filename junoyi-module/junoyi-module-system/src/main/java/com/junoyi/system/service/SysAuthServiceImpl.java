@@ -225,7 +225,9 @@ public class SysAuthServiceImpl implements ISysAuthService {
             return groups;
         }
         // TODO: 从数据库查询用户权限组
-        // return sysPermGroupMapper.selectGroupCodesByUserId(userId);
+        // 1 用户独立绑定的权限组
+        // 2 角色绑定的权限组
+        // 3 部门绑定的权限组
         return new HashSet<>();
     }
 
