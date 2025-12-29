@@ -75,11 +75,12 @@ public class MyBatisPlusConfig {
      * <p>
      * 该拦截器用于美化打印的 SQL 语句，便于开发调试时查看执行的 SQL 内容。
      *
+     * @param properties 数据源配置属性
      * @return SqlBeautifyInterceptor 实例
      */
     @Bean
-    public SqlBeautifyInterceptor sqlBeautifyInterceptor() {
-        return new SqlBeautifyInterceptor();
+    public SqlBeautifyInterceptor sqlBeautifyInterceptor(DataSourceProperties properties) {
+        return new SqlBeautifyInterceptor(properties);
     }
 
     /**
@@ -87,10 +88,11 @@ public class MyBatisPlusConfig {
      * <p>
      * 用于监控执行时间较长的 SQL 语句，帮助识别性能瓶颈。
      *
+     * @param properties 数据源配置属性
      * @return SlowSqlInterceptor 实例
      */
     @Bean
-    public SlowSqlInterceptor slowSqlInterceptor() {
-        return new SlowSqlInterceptor();
+    public SlowSqlInterceptor slowSqlInterceptor(DataSourceProperties properties) {
+        return new SlowSqlInterceptor(properties);
     }
 }
