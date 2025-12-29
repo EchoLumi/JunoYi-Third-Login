@@ -18,11 +18,13 @@ import com.junoyi.framework.security.utils.PasswordUtils;
 import com.junoyi.system.domain.bo.LoginBO;
 import com.junoyi.system.domain.po.LoginIdentity;
 import com.junoyi.system.domain.po.SysUser;
+import com.junoyi.system.domain.po.SysUserDept;
 import com.junoyi.system.domain.vo.AuthVo;
 import com.junoyi.system.domain.po.SysUserRole;
 import com.junoyi.system.domain.vo.UserInfoVO;
 import com.junoyi.system.enums.LoginType;
 import com.junoyi.system.enums.SysUserStatus;
+import com.junoyi.system.mapper.SysUserDeptMapper;
 import com.junoyi.system.mapper.SysUserMapper;
 import com.junoyi.system.mapper.SysUserRoleMapper;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,7 @@ public class SysAuthServiceImpl implements ISysAuthService {
     private final AuthHelper authHelper;
     private final SysUserMapper sysUserMapper;
     private final SysUserRoleMapper sysUserRoleMapper;
+    private final SysUserDeptMapper sysUserDeptMapper;
 
     @Override
     public AuthVo login(LoginBO loginBO) {
@@ -248,8 +251,13 @@ public class SysAuthServiceImpl implements ISysAuthService {
      * @return 返回用户部门 ID 列表
      */
     private Set<Long> getUserDept(Long userId) {
-        // TODO
-        return new HashSet<>();
+        return sysUserDeptMapper.selectList(
+                new LambdaQueryWrapper<SysUserDept>()
+                        .select(SysUserDept::getDeptId)
+                        .eq(SysUserDept::getUserId, userId)
+        ).stream()
+                .map(SysUserDept::getDeptId)
+                .collect(Collectors.toSet());
     }
 
     /**
