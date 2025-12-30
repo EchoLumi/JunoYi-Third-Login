@@ -81,12 +81,4 @@ public class SysMenuController extends BaseController {
         return sysMenuService.deleteMenu(id) ? R.ok() : R.fail("删除失败");
     }
 
-    /**
-     * 批量删除菜单
-     */
-    @DeleteMapping("/batch")
-    @PlatformScope(PlatformType.ADMIN_WEB)
-    public R<?> deleteMenuBatch(@RequestBody List<Long> ids) {
-        return sysMenuService.deleteMenuBatch(ids) ? R.ok() : R.fail("删除失败");
-    }
 }
