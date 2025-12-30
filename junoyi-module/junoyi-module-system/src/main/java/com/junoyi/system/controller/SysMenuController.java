@@ -1,6 +1,7 @@
 package com.junoyi.system.controller;
 
 import com.junoyi.framework.core.domain.module.R;
+import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
@@ -26,7 +27,7 @@ public class SysMenuController extends BaseController {
     private final ISysMenuService sysMenuService;
 
     /**
-     * 获取菜单树形列表
+     * 获取菜单树形列表（不分页，用于构建树形结构）
      */
     @GetMapping("/tree")
     @PlatformScope(PlatformType.ADMIN_WEB)
@@ -35,12 +36,13 @@ public class SysMenuController extends BaseController {
     }
 
     /**
-     * 获取菜单列表（平铺）
+     * 获取菜单列表（分页）
+     * 支持参数: pageNum, pageSize
      */
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    public R<List<SysMenuVO>> getMenuList(SysMenuQueryDTO queryDTO) {
-        return R.ok(sysMenuService.getMenuList(queryDTO));
+    public R<PageResult<SysMenuVO>> getMenuList(SysMenuQueryDTO queryDTO) {
+        return R.ok(sysMenuService.getMenuPage(queryDTO, buildPage()));
     }
 
     /**
@@ -48,7 +50,7 @@ public class SysMenuController extends BaseController {
      */
     @GetMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    public R<SysMenuVO> getMenuById(@PathVariable Long id) {
+    public R<SysMenuVO> getMenuById(@PathVariable("id") Long id) {
         return R.ok(sysMenuService.getMenuById(id));
     }
 
@@ -75,7 +77,7 @@ public class SysMenuController extends BaseController {
      */
     @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    public R<?> deleteMenu(@PathVariable Long id) {
+    public R<?> deleteMenu(@PathVariable("id") Long id) {
         return sysMenuService.deleteMenu(id) ? R.ok() : R.fail("删除失败");
     }
 

@@ -1,7 +1,10 @@
 package com.junoyi.system.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.system.domain.dto.SysMenuDTO;
 import com.junoyi.system.domain.dto.SysMenuQueryDTO;
+import com.junoyi.system.domain.po.SysMenu;
 import com.junoyi.system.domain.vo.SysMenuVO;
 
 import java.util.List;
@@ -22,7 +25,16 @@ public interface ISysMenuService {
     List<SysMenuVO> getMenuTree(SysMenuQueryDTO queryDTO);
 
     /**
-     * 查询菜单列表（平铺）
+     * 查询菜单列表（分页）
+     *
+     * @param queryDTO 查询参数
+     * @param page 分页对象
+     * @return 分页结果
+     */
+    PageResult<SysMenuVO> getMenuPage(SysMenuQueryDTO queryDTO, Page<SysMenu> page);
+
+    /**
+     * 查询菜单列表（不分页）
      *
      * @param queryDTO 查询参数
      * @return 菜单列表
