@@ -9,6 +9,7 @@ import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
 import com.junoyi.system.domain.dto.SysMenuDTO;
 import com.junoyi.system.domain.dto.SysMenuQueryDTO;
+import com.junoyi.system.domain.dto.SysMenuSortDTO;
 import com.junoyi.system.domain.vo.SysMenuVO;
 import com.junoyi.system.service.ISysMenuService;
 import lombok.RequiredArgsConstructor;
@@ -90,8 +91,21 @@ public class SysMenuController extends BaseController {
             value = {"systme.ui.menu.view", "system.api.menu.update"},
             logical = Logical.OR
     )
-    public R<?> updateMenu(@RequestBody SysMenuDTO menuDTO) {
+    public R<Void> updateMenu(@RequestBody SysMenuDTO menuDTO) {
         return sysMenuService.updateMenu(menuDTO) ? R.ok() : R.fail("更新失败");
+    }
+
+    /**
+     * 更新菜单排序
+     */
+    @PutMapping("/sort")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.menu.view", "system.api.menu.update"},
+            logical = Logical.OR
+    )
+    public R<Void> updateMenuSort(@RequestBody SysMenuSortDTO menuSortDTO){
+        return sysMenuService.updateMenuSort(menuSortDTO.getItems()) ? R.ok() : R.fail("排序更新失败");
     }
 
     /**

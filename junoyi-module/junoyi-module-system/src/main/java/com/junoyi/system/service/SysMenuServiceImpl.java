@@ -11,11 +11,13 @@ import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.system.convert.SysMenuConverter;
 import com.junoyi.system.domain.dto.SysMenuDTO;
 import com.junoyi.system.domain.dto.SysMenuQueryDTO;
+import com.junoyi.system.domain.dto.SysMenuSortDTO;
 import com.junoyi.system.domain.po.SysMenu;
 import com.junoyi.system.domain.vo.SysMenuVO;
 import com.junoyi.system.mapper.SysMenuMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -217,5 +219,33 @@ public class SysMenuServiceImpl implements ISysMenuService {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 批量更新菜单排序
+     *
+     * @param sortItems 排序项列表
+     * @return 是否成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateMenuSort(List<SysMenuSortDTO.SortItem> sortItems) {
+        if (sortItems == null || sortItems.isEmpty()) {
+            return false;
+        }
+        log.debug("批量更新菜单排序, 数量: {}", sortItems.size());
+        
+        for (SysMenuSortDTO.SortItem item : sortItems) {
+            if (item.getId() == null) {
+                continue;
+            }
+            SysMenu menu = new SysMenu();
+            menu.setId(item.getId());
+            menu.setParentId(item.getParentId());
+            menu.setSort(item.getSort());
+            menu.setUpdateTime(DateUtils.getNowDate());
+            sysMenuMapper.updateById(menu);
+        }
+        return true;
     }
 }

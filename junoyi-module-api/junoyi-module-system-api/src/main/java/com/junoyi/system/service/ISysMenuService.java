@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.system.domain.dto.SysMenuDTO;
 import com.junoyi.system.domain.dto.SysMenuQueryDTO;
+import com.junoyi.system.domain.dto.SysMenuSortDTO;
 import com.junoyi.system.domain.po.SysMenu;
 import com.junoyi.system.domain.vo.SysMenuVO;
 
@@ -80,4 +81,12 @@ public interface ISysMenuService {
      * @return 是否成功
      */
     boolean deleteMenuBatch(List<Long> ids);
+
+    /**
+     * 批量更新菜单排序
+     *
+     * @param sortItems 排序项列表
+     * @return 是否成功
+     */
+    boolean updateMenuSort(List<SysMenuSortDTO.SortItem> sortItems);
 }
