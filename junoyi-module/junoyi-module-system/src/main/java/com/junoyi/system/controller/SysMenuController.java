@@ -35,8 +35,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/tree")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"systme.ui.menu.view", "system.api.menu.get"},
-            logical = Logical.OR
+            value = {"systme.ui.menu.view", "system.api.menu.get"}
     )
     public R<List<SysMenuVO>> getMenuTree(SysMenuQueryDTO queryDTO) {
         return R.ok(sysMenuService.getMenuTree(queryDTO));
@@ -49,8 +48,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"systme.ui.menu.view", "system.api.menu.get"},
-            logical = Logical.OR
+            value = {"systme.ui.menu.view", "system.api.menu.get"}
     )
     public R<PageResult<SysMenuVO>> getMenuList(SysMenuQueryDTO queryDTO) {
         return R.ok(sysMenuService.getMenuPage(queryDTO, buildPage()));
@@ -62,8 +60,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"systme.ui.menu.view", "system.api.menu.get"},
-            logical = Logical.OR
+            value = {"systme.ui.menu.view", "system.api.menu.get"}
     )
     public R<SysMenuVO> getMenuById(@PathVariable("id") Long id) {
         return R.ok(sysMenuService.getMenuById(id));
@@ -75,8 +72,7 @@ public class SysMenuController extends BaseController {
     @PostMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"systme.ui.menu.view", "system.api.menu.add"},
-            logical = Logical.OR
+            value = {"systme.ui.menu.view", "system.api.menu.add"}
     )
     public R<Long> addMenu(@RequestBody SysMenuDTO menuDTO) {
         return R.ok(sysMenuService.addMenu(menuDTO));
@@ -88,8 +84,7 @@ public class SysMenuController extends BaseController {
     @PutMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"systme.ui.menu.view", "system.api.menu.update"},
-            logical = Logical.OR
+            value = {"systme.ui.menu.view", "system.api.menu.update"}
     )
     public R<Void> updateMenu(@RequestBody SysMenuDTO menuDTO) {
         return sysMenuService.updateMenu(menuDTO) ? R.ok() : R.fail("更新失败");
@@ -101,8 +96,7 @@ public class SysMenuController extends BaseController {
     @PutMapping("/sort")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.menu.view", "system.api.menu.update"},
-            logical = Logical.OR
+            value = {"system.ui.menu.view", "system.api.menu.update"}
     )
     public R<Void> updateMenuSort(@RequestBody SysMenuSortDTO sortDTO){
         return sysMenuService.updateMenuSort(sortDTO.getItems()) ? R.ok() : R.fail("排序更新失败");
@@ -114,8 +108,7 @@ public class SysMenuController extends BaseController {
     @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"systme.ui.menu.view", "system.api.menu.delete"},
-            logical = Logical.OR
+            value = {"systme.ui.menu.view", "system.api.menu.delete"}
     )
     public R<?> deleteMenu(@PathVariable("id") Long id) {
         return sysMenuService.deleteMenu(id) ? R.ok() : R.fail("删除失败");
