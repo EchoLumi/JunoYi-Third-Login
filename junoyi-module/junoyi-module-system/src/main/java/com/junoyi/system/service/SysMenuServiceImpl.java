@@ -127,6 +127,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         if (menuDTO.getId() == null)
             return false;
         SysMenu menu = sysMenuConverter.toEntity(menuDTO);
+        menu.setUpdateTime(DateUtils.getNowDate());
         return sysMenuMapper.updateById(menu) > 0;
     }
 
