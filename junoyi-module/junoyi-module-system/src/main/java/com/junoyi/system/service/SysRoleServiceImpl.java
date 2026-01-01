@@ -40,6 +40,9 @@ public class SysRoleServiceImpl implements ISysRoleService{
                .orderByAsc(SysRole::getSort);
 
         Page<SysRole> resultPage = sysRoleMapper.selectPage(page, wrapper);
-        return new PageResult<>(sysRoleConverter.toVoList(resultPage.getRecords()), resultPage.getTotal());
+        return PageResult.of(sysRoleConverter.toVoList(resultPage.getRecords()), 
+                resultPage.getTotal(), 
+                (int) resultPage.getCurrent(), 
+                (int) resultPage.getSize());
     }
 }
