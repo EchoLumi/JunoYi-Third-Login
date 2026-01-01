@@ -8,6 +8,7 @@ import com.junoyi.framework.permission.annotation.Permission;
 import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
+import com.junoyi.system.domain.dto.SysRoleDTO;
 import com.junoyi.system.domain.dto.SysRoleQueryDTO;
 import com.junoyi.system.domain.vo.SysRoleVO;
 import com.junoyi.system.service.ISysRoleService;
@@ -62,7 +63,7 @@ public class SysRoleController extends BaseController {
             value = {"system.ui.role.view", "system.api.role.get"}
     )
     public R<SysRoleVO> getRoleById(@PathVariable("id") Long id){
-        return R.ok();
+        return R.ok(sysRoleService.getRoleById(id));
     }
 
     /**
@@ -73,7 +74,8 @@ public class SysRoleController extends BaseController {
     @Permission(
             value = {"system.ui.role.view", "system.api.role.add"}
     )
-    public R<Void> addRole(){
+    public R<Void> addRole(@RequestBody SysRoleDTO roleDTO){
+        sysRoleService.addRole(roleDTO);
         return R.ok();
     }
 
@@ -85,19 +87,21 @@ public class SysRoleController extends BaseController {
     @Permission(
             value = {"system.ui.role.view", "system.api.role.update"}
     )
-    public R<Void> updateRole(){
+    public R<Void> updateRole(@RequestBody SysRoleDTO roleDTO){
+        sysRoleService.updateRole(roleDTO);
         return R.ok();
     }
 
     /**
      * 删除角色
      */
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
             value = {"system.ui.role.view", "system.api.role.delete"}
     )
-    public R<Void> deleteRole(){
+    public R<Void> deleteRole(@PathVariable("id") Long id){
+        sysRoleService.deleteRole(id);
         return R.ok();
     }
 
@@ -109,7 +113,8 @@ public class SysRoleController extends BaseController {
     @Permission(
             value = {"system.ui.role.view", "system.api.role.delete"}
     )
-    public R<Void> deleteRoleBatch(){
+    public R<Void> deleteRoleBatch(@RequestBody List<Long> ids){
+        sysRoleService.deleteRoleBatch(ids);
         return R.ok();
     }
 }
