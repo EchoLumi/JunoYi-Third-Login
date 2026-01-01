@@ -43,11 +43,6 @@ public class SysRoleVo {
     private Integer status;
 
     /**
-     * 删除标识符（软删除）
-     */
-    private Boolean delFlag;
-
-    /**
      * 创建时间
      */
     private Date createTime;
