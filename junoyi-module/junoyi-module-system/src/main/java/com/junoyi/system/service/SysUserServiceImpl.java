@@ -55,8 +55,7 @@ public class SysUserServiceImpl implements ISysUserService {
                .like(StringUtils.hasText(queryDTO.getPhonenumber()), SysUser::getPhonenumber, queryDTO.getPhonenumber())
                .eq(StringUtils.hasText(queryDTO.getSex()), SysUser::getSex, queryDTO.getSex())
                .eq(queryDTO.getStatus() != null, SysUser::getStatus, queryDTO.getStatus())
-               .eq(SysUser::isDelFlag, false)
-               .orderByDesc(SysUser::getCreateTime);
+               .eq(SysUser::isDelFlag, false);
 
         Page<SysUser> resultPage = sysUserMapper.selectPage(page, wrapper);
         return PageResult.of(
