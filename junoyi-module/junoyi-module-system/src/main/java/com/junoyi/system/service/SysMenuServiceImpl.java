@@ -1,6 +1,7 @@
 package com.junoyi.system.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.framework.core.exception.menu.MenuHasChildrenException;
@@ -8,11 +9,11 @@ import com.junoyi.framework.core.utils.DateUtils;
 import com.junoyi.framework.core.utils.StringUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
+import com.junoyi.framework.security.utils.SecurityUtils;
 import com.junoyi.system.convert.SysMenuConverter;
 import com.junoyi.system.domain.dto.SysMenuDTO;
 import com.junoyi.system.domain.dto.SysMenuQueryDTO;
-import com.junoyi.system.domain.dto.SysMenuSortDTO;
-import com.junoyi.system.domain.dto.SysMenuSortItem;
+import com.junoyi.system.domain.bo.SysMenuSortItem;
 import com.junoyi.system.domain.po.SysMenu;
 import com.junoyi.system.domain.vo.SysMenuVO;
 import com.junoyi.system.enums.SysMenuStatus;
@@ -241,19 +242,16 @@ public class SysMenuServiceImpl implements ISysMenuService {
             if (item.getId() == null) {
                 continue;
             }
-            SysMenu menu = new SysMenu();
-            menu.setId(item.getId());
-            menu.setParentId(item.getParentId());
-            menu.setSort(item.getSort());
-            // 可选字段：path 和 component
-            if (item.getPath() != null) {
-                menu.setPath(item.getPath());
-            }
-            if (item.getComponent() != null) {
-                menu.setComponent(item.getComponent());
-            }
-            menu.setUpdateTime(DateUtils.getNowDate());
-            sysMenuMapper.updateById(menu);
+            // 使用 LambdaUpdateWrapper 只更新指定字段，避免覆盖其他字段
+            LambdaUpdateWrapper<SysMenu> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(SysMenu::getId, item.getId())
+                    .set(SysMenu::getParentId, item.getParentId())
+                    .set(item.getSort() != null, SysMenu::getSort, item.getSort())
+                    .set(item.getPath() != null, SysMenu::getPath, item.getPath())
+                    .set(item.getComponent() != null, SysMenu::getComponent, item.getComponent())
+                    .set(SysMenu::getUpdateTime, DateUtils.getNowDate())
+                    .set(SysMenu::getUpdateBy, SecurityUtils.getUserName());
+            sysMenuMapper.update(null, updateWrapper);
         }
         return true;
     }

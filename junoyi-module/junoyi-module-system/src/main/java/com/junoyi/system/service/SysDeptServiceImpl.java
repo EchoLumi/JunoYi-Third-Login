@@ -1,18 +1,23 @@
 package com.junoyi.system.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.junoyi.framework.core.exception.dept.DeptHasChildrenException;
 import com.junoyi.framework.core.utils.DateUtils;
 import com.junoyi.framework.security.utils.SecurityUtils;
 import com.junoyi.system.convert.SysDeptConverter;
+import com.junoyi.system.domain.bo.SysDeptSortItem;
 import com.junoyi.system.domain.dto.SysDeptDTO;
 import com.junoyi.system.domain.dto.SysDeptQueryDTO;
+import com.junoyi.system.domain.dto.SysDeptSortDTO;
 import com.junoyi.system.domain.po.SysDept;
 import com.junoyi.system.domain.vo.SysDeptVO;
 import com.junoyi.system.enums.SysDeptStatus;
 import com.junoyi.system.mapper.SysDeptMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -25,6 +30,7 @@ import java.util.stream.Collectors;
  *
  * @author Fan
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SysDeptServiceImpl implements ISysDeptService {
@@ -153,5 +159,35 @@ public class SysDeptServiceImpl implements ISysDeptService {
             }
         }
         return rootList;
+    }
+
+    /**
+     * 批量部门排序
+     * @param sortList 排序列表
+     * @return 是否成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateDeptSort(List<SysDeptSortItem> sortList) {
+        if (sortList == null || sortList.isEmpty()){
+            return false;
+        }
+        log.debug("批量更新部门排序，数量: {}", sortList.size());
+
+        for (SysDeptSortItem item : sortList){
+            if (item.getId() == null){
+                continue;
+            }
+            // 使用 LambdaUpdateWrapper 只更新指定字段，避免基本类型默认值覆盖
+            LambdaUpdateWrapper<SysDept> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(SysDept::getId, item.getId())
+                    .set(SysDept::getParentId, item.getParentId())
+                    .set(item.getSort() != null, SysDept::getSort, item.getSort())
+                    .set(SysDept::getUpdateTime, DateUtils.getNowDate())
+                    .set(SysDept::getUpdateBy, SecurityUtils.getUserName());
+            sysDeptMapper.update(null, updateWrapper);
+        }
+
+        return true;
     }
 }

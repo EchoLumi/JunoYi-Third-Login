@@ -1,5 +1,6 @@
 package com.junoyi.system.service;
 
+import com.junoyi.system.domain.bo.SysDeptSortItem;
 import com.junoyi.system.domain.dto.SysDeptDTO;
 import com.junoyi.system.domain.dto.SysDeptQueryDTO;
 import com.junoyi.system.domain.vo.SysDeptVO;
@@ -38,6 +39,13 @@ public interface ISysDeptService {
      * @param deptDTO 部门信息
      */
     void updateDept(SysDeptDTO deptDTO);
+
+    /**
+     * 批量更新部门排序
+     * @param sortList 排序列表
+     * @return 是否成功
+     */
+    boolean updateDeptSort(List<SysDeptSortItem> sortList);
 
     /**
      * 删除部门（逻辑删除）

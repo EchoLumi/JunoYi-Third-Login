@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.system.domain.dto.SysMenuDTO;
 import com.junoyi.system.domain.dto.SysMenuQueryDTO;
-import com.junoyi.system.domain.dto.SysMenuSortItem;
+import com.junoyi.system.domain.bo.SysMenuSortItem;
 import com.junoyi.system.domain.po.SysMenu;
 import com.junoyi.system.domain.vo.SysMenuVO;
 

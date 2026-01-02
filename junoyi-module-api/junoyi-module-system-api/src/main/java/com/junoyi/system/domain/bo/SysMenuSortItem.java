@@ -1,4 +1,4 @@
-package com.junoyi.system.domain.dto;
+package com.junoyi.system.domain.bo;
 
 import lombok.Data;
 

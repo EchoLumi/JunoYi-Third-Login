@@ -9,6 +9,7 @@ import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
 import com.junoyi.system.domain.dto.SysDeptDTO;
 import com.junoyi.system.domain.dto.SysDeptQueryDTO;
+import com.junoyi.system.domain.dto.SysDeptSortDTO;
 import com.junoyi.system.domain.vo.SysDeptVO;
 import com.junoyi.system.service.ISysDeptService;
 import lombok.RequiredArgsConstructor;
@@ -77,6 +78,19 @@ public class SysDeptController extends BaseController {
     )
     public R<Void> updateDept(@RequestBody SysDeptDTO sysDeptDTO){
         sysDeptService.updateDept(sysDeptDTO);
+        return R.ok();
+    }
+
+    /**
+     * 更新部门排序
+     */
+    @PutMapping("/sort")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.dept.view", "system.api.dept.update"}
+    )
+    public R<Void> updateDeptSort(@RequestBody SysDeptSortDTO sortDTO){
+        sysDeptService.updateDeptSort(sortDTO.getItems());
         return R.ok();
     }
 

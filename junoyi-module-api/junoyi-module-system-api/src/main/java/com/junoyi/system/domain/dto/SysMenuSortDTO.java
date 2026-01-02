@@ -1,5 +1,6 @@
 package com.junoyi.system.domain.dto;
 
+import com.junoyi.system.domain.bo.SysMenuSortItem;
 import lombok.Data;
 
 import java.util.List;
