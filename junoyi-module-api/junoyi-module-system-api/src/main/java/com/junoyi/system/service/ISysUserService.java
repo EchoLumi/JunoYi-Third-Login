@@ -7,6 +7,8 @@ import com.junoyi.system.domain.dto.SysUserQueryDTO;
 import com.junoyi.system.domain.po.SysUser;
 import com.junoyi.system.domain.vo.SysUserVO;
 
+import java.util.List;
+
 /**
  * 系统用户业务接口类
  *
@@ -33,4 +35,16 @@ public interface ISysUserService {
      * @param userDTO 用户信息
      */
     void updateUser(SysUserDTO userDTO);
+
+    /**
+     * 删除用户（逻辑删除）
+     * @param id 用户ID
+     */
+    void deleteUser(Long id);
+
+    /**
+     * 批量删除用户（逻辑删除）
+     * @param ids 用户ID列表
+     */
+    void deleteUserBatch(List<Long> ids);
 }

@@ -16,6 +16,8 @@ import com.junoyi.system.service.ISysUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 系统用户控制类
  *
@@ -85,9 +87,26 @@ public class SysUserController extends BaseController {
     /**
      * 删除用户
      */
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
-    public R<Void> delUser(){
+    @Permission(
+            value = {"system.ui.user.view", "system.api.user.delete"}
+    )
+    public R<Void> deleteUser(@PathVariable Long id){
+        sysUserService.deleteUser(id);
+        return R.ok();
+    }
+
+    /**
+     * 批量删除
+     */
+    @DeleteMapping("/batch")
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    @Permission(
+            value = {"system.ui.user.view", "system.api.user.delete"}
+    )
+    public R<Void> deleteUserBatch(@RequestBody List<Long> ids){
+        sysUserService.deleteUserBatch(ids);
         return R.ok();
     }
 

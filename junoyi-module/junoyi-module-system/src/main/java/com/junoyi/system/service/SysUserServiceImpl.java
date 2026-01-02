@@ -11,11 +11,14 @@ import com.junoyi.system.domain.dto.SysUserDTO;
 import com.junoyi.system.domain.dto.SysUserQueryDTO;
 import com.junoyi.system.domain.po.SysUser;
 import com.junoyi.system.domain.po.SysUserDept;
+import com.junoyi.system.domain.po.SysUserRole;
 import com.junoyi.system.domain.vo.SysUserVO;
 import com.junoyi.system.enums.SysUserStatus;
 import com.junoyi.system.mapper.SysUserDeptMapper;
 import com.junoyi.system.mapper.SysUserMapper;
+import com.junoyi.system.mapper.SysUserRoleMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -33,6 +36,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     private final SysUserMapper sysUserMapper;
     private final SysUserDeptMapper sysUserDeptMapper;
+    private final SysUserRoleMapper sysUserRoleMapper;
     private final SysUserConverter sysUserConverter;
 
     @Override
@@ -103,5 +107,49 @@ public class SysUserServiceImpl implements ISysUserService {
         sysUser.setUpdateTime(DateUtils.getNowDate());
         sysUser.setUpdateBy(SecurityUtils.getUserName());
         sysUserMapper.updateById(sysUser);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUser(Long id) {
+        // 逻辑删除用户
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(id);
+        sysUser.setDelFlag(true);
+        sysUser.setUpdateTime(DateUtils.getNowDate());
+        sysUser.setUpdateBy(SecurityUtils.getUserName());
+        sysUserMapper.updateById(sysUser);
+        
+        // 删除用户角色关联
+        sysUserRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
+                .eq(SysUserRole::getUserId, id));
+        
+        // 删除用户部门关联
+        sysUserDeptMapper.delete(new LambdaQueryWrapper<SysUserDept>()
+                .eq(SysUserDept::getUserId, id));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUserBatch(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        
+        // 批量逻辑删除用户
+        SysUser sysUser = new SysUser();
+        sysUser.setDelFlag(true);
+        sysUser.setUpdateTime(DateUtils.getNowDate());
+        sysUser.setUpdateBy(SecurityUtils.getUserName());
+        sysUserMapper.update(sysUser, new LambdaQueryWrapper<SysUser>()
+                .in(SysUser::getUserId, ids));
+        
+        // 批量删除用户角色关联
+        sysUserRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
+                .in(SysUserRole::getUserId, ids));
+        
+        // 批量删除用户部门关联
+        sysUserDeptMapper.delete(new LambdaQueryWrapper<SysUserDept>()
+                .in(SysUserDept::getUserId, ids));
     }
 }
