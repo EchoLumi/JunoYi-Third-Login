@@ -9,6 +9,7 @@ import com.junoyi.framework.permission.enums.Logical;
 import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
+import com.junoyi.system.domain.dto.SysUserDTO;
 import com.junoyi.system.domain.dto.SysUserQueryDTO;
 import com.junoyi.system.domain.vo.SysUserVO;
 import com.junoyi.system.service.ISysUserService;
@@ -34,9 +35,7 @@ public class SysUserController extends BaseController {
      */
     @GetMapping
     @Permission(
-            // 需要拥有什么权限
-            value = {"system.ui.user.view", "system.api.user.get"},
-            logical = Logical.OR
+            value = {"system.ui.user.view", "system.api.user.get"}
     )
     @PlatformScope(PlatformType.ADMIN_WEB)
     public R<PageResult<SysUserVO>> getUserList(SysUserQueryDTO queryDTO){
@@ -61,8 +60,21 @@ public class SysUserController extends BaseController {
      */
     @PostMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
-    public void addUser(){
+    @Permission(
+            value = {"system.ui.user.view", "system.api.user.add"}
+    )
+    public R<Void> addUser(@RequestBody SysUserDTO sysUserDTO){
+        sysUserService.addUser(sysUserDTO);
+        return R.ok();
+    }
 
+
+    /**
+     * 更新用户
+     */
+    @PutMapping
+    @PlatformScope(PlatformType.ADMIN_WEB)
+    public void updateUser(){
     }
 
     /**
@@ -70,15 +82,8 @@ public class SysUserController extends BaseController {
      */
     @DeleteMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
-    public void delUser(){
-
+    public R<Void> delUser(){
+        return R.ok();
     }
 
-    /**
-     * 删除用户
-     */
-    @PutMapping
-    @PlatformScope(PlatformType.ADMIN_WEB)
-    public void updateUser(){
-    }
 }

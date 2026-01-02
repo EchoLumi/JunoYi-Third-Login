@@ -2,6 +2,7 @@ package com.junoyi.system.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.system.domain.dto.SysUserDTO;
 import com.junoyi.system.domain.dto.SysUserQueryDTO;
 import com.junoyi.system.domain.po.SysUser;
 import com.junoyi.system.domain.vo.SysUserVO;
@@ -20,4 +21,10 @@ public interface ISysUserService {
      * @return 用户分页列表
      */
     PageResult<SysUserVO> getUserList(SysUserQueryDTO queryDTO, Page<SysUser> page);
+
+    /**
+     * 添加用户
+     * @param userDTO 用户信息
+     */
+    void addUser(SysUserDTO userDTO);
 }

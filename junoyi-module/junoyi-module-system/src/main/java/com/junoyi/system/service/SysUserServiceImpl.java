@@ -3,15 +3,24 @@ package com.junoyi.system.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.junoyi.framework.core.domain.page.PageResult;
+import com.junoyi.framework.core.utils.DateUtils;
+import com.junoyi.framework.security.utils.PasswordUtils;
+import com.junoyi.framework.security.utils.SecurityUtils;
 import com.junoyi.system.convert.SysUserConverter;
+import com.junoyi.system.domain.dto.SysUserDTO;
 import com.junoyi.system.domain.dto.SysUserQueryDTO;
 import com.junoyi.system.domain.po.SysUser;
 import com.junoyi.system.domain.po.SysUserDept;
+import com.junoyi.system.domain.po.SysUserRole;
 import com.junoyi.system.domain.vo.SysUserVO;
+import com.junoyi.system.enums.SysUserStatus;
 import com.junoyi.system.mapper.SysUserDeptMapper;
 import com.junoyi.system.mapper.SysUserMapper;
+import com.junoyi.system.mapper.SysUserRoleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -28,6 +37,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     private final SysUserMapper sysUserMapper;
     private final SysUserDeptMapper sysUserDeptMapper;
+    private final SysUserRoleMapper sysUserRoleMapper;
     private final SysUserConverter sysUserConverter;
 
     @Override
@@ -64,5 +74,47 @@ public class SysUserServiceImpl implements ISysUserService {
                 (int) resultPage.getCurrent(),
                 (int) resultPage.getSize()
         );
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addUser(SysUserDTO userDTO) {
+        // 创建用户实体
+        SysUser sysUser = sysUserConverter.toEntity(userDTO);
+        
+        // 密码加密
+        PasswordUtils.EncryptResult encryptResult = PasswordUtils.encrypt(userDTO.getPassword());
+        sysUser.setPassword(encryptResult.getEncodedPassword());
+        sysUser.setSalt(encryptResult.getSalt());
+        
+        // 设置默认值
+        sysUser.setDelFlag(false);
+        sysUser.setStatus(userDTO.getStatus() != null ? userDTO.getStatus() : SysUserStatus.NORMAL.getCode());
+        sysUser.setCreateTime(DateUtils.getNowDate());
+        sysUser.setCreateBy(SecurityUtils.getUserName());
+        
+        // 插入用户
+        sysUserMapper.insert(sysUser);
+        Long userId = sysUser.getUserId();
+        
+        // 关联角色
+        if (!CollectionUtils.isEmpty(userDTO.getRoleIds())) {
+            for (Long roleId : userDTO.getRoleIds()) {
+                SysUserRole userRole = new SysUserRole();
+                userRole.setUserId(userId);
+                userRole.setRoleId(roleId);
+                sysUserRoleMapper.insert(userRole);
+            }
+        }
+        
+        // 关联部门
+        if (!CollectionUtils.isEmpty(userDTO.getDeptIds())) {
+            for (Long deptId : userDTO.getDeptIds()) {
+                SysUserDept userDept = new SysUserDept();
+                userDept.setUserId(userId);
+                userDept.setDeptId(deptId);
+                sysUserDeptMapper.insert(userDept);
+            }
+        }
     }
 }
