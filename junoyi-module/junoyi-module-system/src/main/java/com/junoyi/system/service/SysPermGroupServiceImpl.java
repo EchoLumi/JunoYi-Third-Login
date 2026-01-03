@@ -27,10 +27,12 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
     @Override
     public PageResult<SysPermGroupVO> getPermGroupList(SysPermGroupQueryDTO queryDTO, Page<SysPermGroup> page) {
         LambdaQueryWrapper<SysPermGroup> wrapper = new LambdaQueryWrapper<>();
-        wrapper.like(StringUtils.hasText(queryDTO.getGroupCode()), SysPermGroup::getGroupCode, queryDTO.getGroupCode())
-                .like(StringUtils.hasText(queryDTO.getGroupName()), SysPermGroup::getGroupName, queryDTO.getGroupName())
-                .eq(queryDTO.getStatus() != null, SysPermGroup::getStatus, queryDTO.getStatus())
-                .orderByAsc(SysPermGroup::getPriority);
+        if (queryDTO != null) {
+            wrapper.like(StringUtils.hasText(queryDTO.getGroupCode()), SysPermGroup::getGroupCode, queryDTO.getGroupCode())
+                    .like(StringUtils.hasText(queryDTO.getGroupName()), SysPermGroup::getGroupName, queryDTO.getGroupName())
+                    .eq(queryDTO.getStatus() != null, SysPermGroup::getStatus, queryDTO.getStatus());
+        }
+        wrapper.orderByAsc(SysPermGroup::getPriority);
 
         Page<SysPermGroup> resultPage = sysPermGroupMapper.selectPage(page, wrapper);
         return PageResult.of(sysPermGroupConverter.toVoList(resultPage.getRecords()),
