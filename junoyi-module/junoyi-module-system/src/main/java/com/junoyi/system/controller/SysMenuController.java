@@ -3,6 +3,7 @@ package com.junoyi.system.controller;
 import com.junoyi.framework.core.domain.module.R;
 import com.junoyi.framework.core.domain.page.PageResult;
 import com.junoyi.framework.permission.annotation.Permission;
+import com.junoyi.framework.permission.enums.Logical;
 import com.junoyi.framework.security.annotation.PlatformScope;
 import com.junoyi.framework.security.enums.PlatformType;
 import com.junoyi.framework.web.domain.BaseController;
@@ -34,7 +35,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/tree")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"systme.ui.menu.view", "system.api.menu.get"}
+            value = {"system.ui.menu.view", "system.api.menu.get"}
     )
     public R<List<SysMenuVO>> getMenuTree(SysMenuQueryDTO queryDTO) {
         return R.ok(sysMenuService.getMenuTree(queryDTO));
