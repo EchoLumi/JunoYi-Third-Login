@@ -47,6 +47,7 @@ public class SysPermissionController extends BaseController {
      * 获取权限组下拉列表
      */
     @GetMapping("/options")
+    @PlatformScope(PlatformType.ADMIN_WEB)
     public R<List<SysPermGroupVO>> getPermissionGroupOptions(){
         return R.ok(sysPermGroupService.getPermGroupOptions());
     }
@@ -72,7 +73,8 @@ public class SysPermissionController extends BaseController {
     @Permission(
             value = {"system.ui.permission.view", "system.api.permission.update"}
     )
-    public R<Void> updatePermission(){
+    public R<Void> updatePermission(@RequestBody SysPermGroupDTO dto){
+        sysPermGroupService.updatePermGroup(dto);
         return R.ok();
     }
 

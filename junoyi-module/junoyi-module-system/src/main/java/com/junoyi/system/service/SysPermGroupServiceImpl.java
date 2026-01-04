@@ -82,6 +82,16 @@ public class SysPermGroupServiceImpl implements ISysPermGroupService {
         sysPermGroupMapper.insert(permGroup);
     }
 
-
+    /**
+     * 更新权限组
+     * @param dto 权限组DTO对象
+     */
+    @Override
+    public void updatePermGroup(SysPermGroupDTO dto) {
+        SysPermGroup permGroup = sysPermGroupConverter.toPo(dto);
+        permGroup.setUpdateBy(SecurityUtils.getUserName());
+        permGroup.setUpdateTime(DateUtils.getNowDate());
+        sysPermGroupMapper.updateById(permGroup);
+    }
 
 }

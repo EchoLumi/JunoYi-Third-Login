@@ -39,6 +39,10 @@ public interface ISysPermGroupService {
      */
     void addPermGroup(SysPermGroupDTO dto);
 
-
-
+    /**
+     * 更新权限组
+     *
+     * @param dto 权限组数据
+     */
+    void updatePermGroup(SysPermGroupDTO dto);
 }
