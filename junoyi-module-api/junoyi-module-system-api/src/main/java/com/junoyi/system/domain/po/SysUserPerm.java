@@ -1,7 +1,5 @@
 package com.junoyi.system.domain.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -21,30 +19,26 @@ public class SysUserPerm {
     /**
      * 主键ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId
     private Long id;
 
     /**
      * 用户ID，关联用户表
      */
-    @TableField("user_id")
     private Long userId;
 
     /**
      * 权限字符串，表示具体的权限标识
      */
-    @TableField("permission")
     private String permission;
 
     /**
      * 权限过期时间，超过此时间权限失效
      */
-    @TableField("expire_time")
     private Date expireTime;
 
     /**
      * 记录创建时间
      */
-    @TableField("create_time")
     private Date createTime;
 }
