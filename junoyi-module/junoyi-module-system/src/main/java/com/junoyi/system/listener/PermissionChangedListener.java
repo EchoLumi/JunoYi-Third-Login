@@ -34,6 +34,7 @@ public class PermissionChangedListener {
     private final SysDeptGroupMapper sysDeptGroupMapper;
     private final SysUserRoleMapper sysUserRoleMapper;
     private final SysUserDeptMapper sysUserDeptMapper;
+    private final SysUserPermMapper sysUserPermMapper;
     private final SysPermGroupMapper sysPermGroupMapper;
 
     /**
@@ -89,8 +90,8 @@ public class PermissionChangedListener {
                 // 角色变更：查找拥有该角色的用户
                 userIds.addAll(findUsersByRole(resourceId));
             }
-            case USER_ROLE_CHANGE, USER_GROUP_CHANGE, USER_DEPT_CHANGE -> {
-                // 用户角色/权限组/部门变更：直接就是该用户
+            case USER_ROLE_CHANGE, USER_GROUP_CHANGE, USER_DEPT_CHANGE, USER_PERM_CHANGE -> {
+                // 用户角色/权限组/部门/独立权限变更：直接就是该用户
                 userIds.add(resourceId);
             }
             case DEPT_GROUP_CHANGE -> {
@@ -301,6 +302,14 @@ public class PermissionChangedListener {
                 }
             }
         }
+
+        // 加载用户独立权限
+        sysUserPermMapper.selectList(
+                new LambdaQueryWrapper<SysUserPerm>()
+                        .select(SysUserPerm::getPermission)
+                        .eq(SysUserPerm::getUserId, userId)
+                        .and(w -> w.isNull(SysUserPerm::getExpireTime).or().gt(SysUserPerm::getExpireTime, now))
+        ).forEach(up -> permissions.add(up.getPermission()));
 
         boolean isSuperAdmin = permissions.contains("*");
 
