@@ -58,6 +58,10 @@ public class PermissionChangedEvent extends BaseEvent {
          */
         USER_GROUP_CHANGE,
         /**
+         * 用户部门变更
+         */
+        USER_DEPT_CHANGE,
+        /**
          * 部门权限组变更
          */
         DEPT_GROUP_CHANGE
