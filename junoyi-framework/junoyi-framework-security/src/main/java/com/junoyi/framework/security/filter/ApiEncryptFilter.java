@@ -61,24 +61,13 @@ public class ApiEncryptFilter extends OncePerRequestFilter {
         HttpServletResponse wrappedResponse = response;
         boolean needEncryptResponse = false;
 
-        // 始终打印 INFO 级别日志以便调试
-        String xEncrypted = request.getHeader("X-Encrypted");
-        String contentType = request.getContentType();
-        String method = request.getMethod();
-        log.info("ApiEncryptFilter", "URI: " + requestURI + 
-                ", Method: " + method +
-                ", ContentType: " + contentType + 
-                ", X-Encrypted: " + xEncrypted +
-                ", apiEncrypt.request: " + securityProperties.getApiEncrypt().isRequest());
-
         try {
             // 处理请求体解密
             boolean needDecrypt = securityProperties.getApiEncrypt().isRequest() && needDecryptRequest(request);
-            log.info("ApiEncryptCheck", "needDecrypt: " + needDecrypt);
             
             if (needDecrypt) {
                 wrappedRequest = decryptRequest(request);
-                log.info("RequestDecrypted", "Request body decrypted, URI: " + requestURI + ", New ContentType: " + wrappedRequest.getContentType());
+                log.debug("RequestDecrypted", "Request body decrypted, URI: " + requestURI);
             }
 
             // 判断是否需要加密响应
@@ -109,22 +98,14 @@ public class ApiEncryptFilter extends OncePerRequestFilter {
     private boolean needDecryptRequest(HttpServletRequest request) {
         // 检查请求头中是否有加密标识
         String encrypted = request.getHeader("X-Encrypted");
-        String method = request.getMethod();
-        
-        log.info("NeedDecryptCheck", "X-Encrypted header: '" + encrypted + "', Method: " + method);
-        
-        if (!"true".equalsIgnoreCase(encrypted)) {
-            log.info("NeedDecryptCheck", "X-Encrypted is not 'true', skipping decryption");
+        if (!"true".equalsIgnoreCase(encrypted))
             return false;
-        }
 
         // 只对 POST/PUT/PATCH 请求进行解密
-        boolean shouldDecrypt = "POST".equalsIgnoreCase(method) 
+        String method = request.getMethod();
+        return "POST".equalsIgnoreCase(method) 
             || "PUT".equalsIgnoreCase(method) 
             || "PATCH".equalsIgnoreCase(method);
-        
-        log.info("NeedDecryptCheck", "Should decrypt: " + shouldDecrypt);
-        return shouldDecrypt;
     }
 
     /**
