@@ -37,7 +37,7 @@ public class SysPermissionPoolController extends BaseController {
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission-pool.view", "system.api.permission-pool.get"}
+            value = {"system.ui.permission.pool.view", "system.api.permission.pool.get"}
     )
     public R<PageResult<SysPermissionVO>> getPermissionPoolList(SysPermissionQueryDTO queryDTO) {
         return R.ok(sysPermissionService.getPermissionList(queryDTO, buildPage()));
@@ -58,7 +58,7 @@ public class SysPermissionPoolController extends BaseController {
     @PostMapping
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission-pool.view", "system.api.permission-pool.add"}
+            value = {"system.ui.permissio.pool.view", "system.api.permission.pool.add"}
     )
     public R<Void> addPermission(@RequestBody SysPermissionDTO dto) {
         sysPermissionService.addPermission(dto);
@@ -71,7 +71,7 @@ public class SysPermissionPoolController extends BaseController {
     @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission-pool.view", "system.api.permission-pool.delete"}
+            value = {"system.ui.permission.pool.view", "system.api.permission.pool.delete"}
     )
     public R<Void> deletePermission(@PathVariable("id") Long id) {
         sysPermissionService.deletePermission(id);
@@ -84,7 +84,7 @@ public class SysPermissionPoolController extends BaseController {
     @DeleteMapping("/batch")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.permission-pool.view", "system.api.permission-pool.delete"}
+            value = {"system.ui.permission.pool.view", "system.api.permission.pool.delete"}
     )
     public R<Void> deletePermissionBatch(@RequestBody List<Long> ids) {
         sysPermissionService.deletePermissionBatch(ids);
