@@ -57,6 +57,8 @@ public class SysSessionController extends BaseController {
 
     /**
      * 批量踢出会话
+     * 
+     * @param sessionIds 会话ID列表
      */
     @DeleteMapping("/batch")
     @PlatformScope(PlatformType.ADMIN_WEB)
