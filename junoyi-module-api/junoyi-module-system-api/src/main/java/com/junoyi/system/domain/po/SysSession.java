@@ -70,6 +70,16 @@ public class SysSession {
     private String deviceType;
 
     /**
+     * 操作系统（如 Windows 10、macOS、Android 13）
+     */
+    private String os;
+
+    /**
+     * 浏览器（如 Chrome 120、Firefox 121）
+     */
+    private String browser;
+
+    /**
      * AccessToken 过期时间
      */
     private Long accessExpireTime;

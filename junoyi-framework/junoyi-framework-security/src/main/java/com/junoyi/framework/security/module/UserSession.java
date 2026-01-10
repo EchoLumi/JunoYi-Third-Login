@@ -108,6 +108,16 @@ public class UserSession implements Serializable {
     private String deviceType;
 
     /**
+     * 操作系统
+     */
+    private String os;
+
+    /**
+     * 浏览器
+     */
+    private String browser;
+
+    /**
      * AccessToken 过期时间
      */
     private Long accessExpireTime;

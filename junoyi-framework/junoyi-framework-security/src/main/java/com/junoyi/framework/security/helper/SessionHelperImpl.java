@@ -2,6 +2,7 @@ package com.junoyi.framework.security.helper;
 
 import com.junoyi.framework.core.utils.IPUtils;
 import com.junoyi.framework.core.utils.StringUtils;
+import com.junoyi.framework.core.utils.UserAgentUtils;
 import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.redis.utils.RedisUtils;
@@ -76,7 +77,9 @@ public class SessionHelperImpl implements SessionHelper {
                 .loginTime(now)
                 .lastAccessTime(now)
                 .userAgent(userAgent)
-                .deviceType(parseDeviceType(userAgent))
+                .deviceType(UserAgentUtils.parseDeviceType(userAgent))
+                .os(UserAgentUtils.parseOS(userAgent))
+                .browser(UserAgentUtils.parseBrowser(userAgent))
                 .accessExpireTime(tokenPair.getAccessExpireTime())
                 .refreshExpireTime(tokenPair.getRefreshExpireTime())
                 .build();
@@ -552,26 +555,4 @@ public class SessionHelperImpl implements SessionHelper {
         return sessions;
     }
 
-    /**
-     * 解析设备类型
-     *
-     * @param userAgent 浏览器请求头中的User-Agent字段
-     * @return String 设备类型：Mobile / Tablet / Desktop / Unknown
-     */
-    private String parseDeviceType(String userAgent) {
-        if (StringUtils.isBlank(userAgent))
-            return "Unknown";
-
-        userAgent = userAgent.toLowerCase();
-
-        if (userAgent.contains("mobile") || userAgent.contains("android") || userAgent.contains("iphone")) {
-            return "Mobile";
-        } else if (userAgent.contains("tablet") || userAgent.contains("ipad")) {
-            return "Tablet";
-        } else if (userAgent.contains("windows") || userAgent.contains("macintosh") || userAgent.contains("linux")) {
-            return "Desktop";
-        }
-
-        return "Unknown";
-    }
 }
