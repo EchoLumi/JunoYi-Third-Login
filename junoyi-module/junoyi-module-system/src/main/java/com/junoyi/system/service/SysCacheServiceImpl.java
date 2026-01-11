@@ -23,6 +23,11 @@ import java.util.stream.Collectors;
 @Service
 public class SysCacheServiceImpl implements ISysCacheService {
 
+    /**
+     * 获取 Redis 服务器信息
+     *
+     * @return Redis 信息
+     */
     @Override
     public RedisInfoVO getRedisInfo() {
         Map<String, String> info = RedisUtils.getServerInfo();
@@ -65,6 +70,13 @@ public class SysCacheServiceImpl implements ISysCacheService {
         return vo;
     }
 
+    /**
+     * 查询缓存键列表（分页）
+     *
+     * @param query     查询条件
+     * @param pageQuery 分页参数
+     * @return 分页结果
+     */
     @Override
     public PageResult<CacheKeyVO> getCacheKeyList(CacheKeyQueryDTO query, PageQuery pageQuery) {
         // 构建查询模式
@@ -102,6 +114,13 @@ public class SysCacheServiceImpl implements ISysCacheService {
         return PageResult.of(records, total, pageQuery);
     }
 
+    /**
+     * 构建缓存键值对象
+     * 根据指定的key获取相关的缓存信息并封装成CacheKeyVO对象返回
+     *
+     * @param key 缓存键值
+     * @return CacheKeyVO 包含缓存键的详细信息的对象
+     */
     private CacheKeyVO buildCacheKeyVO(String key) {
         CacheKeyVO vo = new CacheKeyVO();
         vo.setKey(key);
@@ -112,6 +131,13 @@ public class SysCacheServiceImpl implements ISysCacheService {
         return vo;
     }
 
+
+    /**
+     * 获取缓存键详情（包含值）
+     *
+     * @param key 键名
+     * @return 缓存详情
+     */
     @Override
     public CacheKeyDetailVO getCacheKeyDetail(String key) {
         if (!RedisUtils.hasKey(key)) {
@@ -127,6 +153,11 @@ public class SysCacheServiceImpl implements ISysCacheService {
         return vo;
     }
 
+    /**
+     * 将字符串解析为Long类型数值
+     * @param value 待解析的字符串
+     * @return 解析成功返回对应的Long值，解析失败或输入为空则返回null
+     */
     private Long parseLong(String value) {
         if (value == null || value.isEmpty()) {
             return null;
@@ -138,6 +169,11 @@ public class SysCacheServiceImpl implements ISysCacheService {
         }
     }
 
+    /**
+     * 将字符串解析为Integer类型数值
+     * @param value 待解析的字符串
+     * @return 解析成功返回对应的Integer值，解析失败或输入为空则返回null
+     */
     private Integer parseInt(String value) {
         if (value == null || value.isEmpty()) {
             return null;
@@ -149,10 +185,17 @@ public class SysCacheServiceImpl implements ISysCacheService {
         }
     }
 
+    /**
+     * 将字节数转换为可读的格式化字符串
+     * @param bytes 字节数
+     * @return 格式化后的大小字符串（B、KB、MB或GB单位）
+     */
     private String formatBytes(Long bytes) {
+        // 处理空值情况
         if (bytes == null) {
             return "0 B";
         }
+        // 根据字节数选择合适的单位进行格式化
         if (bytes < 1024) {
             return bytes + " B";
         } else if (bytes < 1024 * 1024) {
@@ -163,4 +206,5 @@ public class SysCacheServiceImpl implements ISysCacheService {
             return String.format("%.2f GB", bytes / (1024.0 * 1024 * 1024));
         }
     }
+
 }
