@@ -100,10 +100,10 @@ public class SysCacheServiceImpl implements ISysCacheService {
 
         // 分页
         int offset = pageQuery.getOffset();
-        int pageSize = pageQuery.getPageSize();
+        int size = pageQuery.getSize();
         List<String> pagedKeys = filteredKeys.stream()
                 .skip(offset)
-                .limit(pageSize)
+                .limit(size)
                 .collect(Collectors.toList());
 
         // 转换为 VO

@@ -95,24 +95,24 @@ public class BaseController {
 
     /**
      * 获取分页参数（从请求参数中）
-     * 支持参数: pageNum, pageSize, orderBy, orderType
+     * 支持参数: current, size, orderBy, orderType
      */
     protected PageQuery getPageQuery() {
         PageQuery query = new PageQuery();
-        query.setPageNum(ServletUtils.getParameterToInt("pageNum", 1));
-        query.setPageSize(ServletUtils.getParameterToInt("pageSize", 10));
+        query.setCurrent(ServletUtils.getParameterToInt("current", 1));
+        query.setSize(ServletUtils.getParameterToInt("size", 10));
         query.setOrderBy(ServletUtils.getParameter("orderBy"));
         query.setOrderType(ServletUtils.getParameter("orderType", "asc"));
         
         // 限制每页最大数量，防止恶意请求
-        if (query.getPageSize() > 100) {
-            query.setPageSize(100);
+        if (query.getSize() > 100) {
+            query.setSize(100);
         }
-        if (query.getPageSize() < 1) {
-            query.setPageSize(10);
+        if (query.getSize() < 1) {
+            query.setSize(10);
         }
-        if (query.getPageNum() < 1) {
-            query.setPageNum(1);
+        if (query.getCurrent() < 1) {
+            query.setCurrent(1);
         }
         
         return query;
@@ -123,14 +123,14 @@ public class BaseController {
      */
     protected <T> Page<T> buildPage() {
         PageQuery query = getPageQuery();
-        return new Page<>(query.getPageNum(), query.getPageSize());
+        return new Page<>(query.getCurrent(), query.getSize());
     }
 
     /**
      * 构建 MyBatis-Plus 分页对象（指定类型）
      */
     protected <T> Page<T> buildPage(PageQuery query) {
-        return new Page<>(query.getPageNum(), query.getPageSize());
+        return new Page<>(query.getCurrent(), query.getSize());
     }
 
     /**

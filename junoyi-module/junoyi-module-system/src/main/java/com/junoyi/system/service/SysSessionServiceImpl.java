@@ -44,16 +44,16 @@ public class SysSessionServiceImpl implements ISysSessionService {
 
         // 手动分页
         int total = filteredList.size();
-        int pageNum = pageQuery.getPageNum();
-        int pageSize = pageQuery.getPageSize();
-        int fromIndex = (pageNum - 1) * pageSize;
-        int toIndex = Math.min(fromIndex + pageSize, total);
+        int current = pageQuery.getCurrent();
+        int size = pageQuery.getSize();
+        int fromIndex = (current - 1) * size;
+        int toIndex = Math.min(fromIndex + size, total);
 
         List<SysSession> pageList = fromIndex < total
                 ? filteredList.subList(fromIndex, toIndex)
                 : List.of();
 
-        return PageResult.of(pageList, (long) total, pageNum, pageSize);
+        return PageResult.of(pageList, (long) total, current, size);
     }
 
 

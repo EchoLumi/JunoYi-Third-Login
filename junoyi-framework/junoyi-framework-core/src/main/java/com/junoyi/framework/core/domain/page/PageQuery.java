@@ -13,12 +13,12 @@ public class PageQuery {
     /**
      * 当前页码（从1开始）
      */
-    private Integer pageNum = 1;
+    private Integer current = 1;
 
     /**
      * 每页数量
      */
-    private Integer pageSize = 10;
+    private Integer size = 10;
 
     /**
      * 排序字段
@@ -34,7 +34,7 @@ public class PageQuery {
      * 获取偏移量（用于 LIMIT offset, size）
      */
     public Integer getOffset() {
-        return (pageNum - 1) * pageSize;
+        return (current - 1) * size;
     }
 
     /**
