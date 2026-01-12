@@ -239,11 +239,13 @@ junoyi:
       - /auth/refresh
       - /system/info
       - /captcha/**
-      # API 文档相关路径 (SpringDoc)
+      # API 文档相关路径
+      - /doc.html
       - /swagger-ui.html
       - /swagger-ui/**
       - /v3/api-docs/**
       - /webjars/**
+      - /favicon.ico
     # 登录机制
     login:
       # 最大登录失败次数

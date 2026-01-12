@@ -13,7 +13,7 @@
     <artifactId>junoyi-framework-api-doc</artifactId>
 
     <description>
-        API 文档集成核心模块（基于 SpringDoc OpenAPI 3）
+        API 文档集成核心模块（基于 SpringDoc OpenAPI 3 + Knife4j UI）
     </description>
 
     <dependencies>
@@ -34,6 +34,12 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
+        <!-- Knife4j UI (仅前端界面，不含后端逻辑) -->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-ui</artifactId>
         </dependency>
 
         <!-- Lombok -->
