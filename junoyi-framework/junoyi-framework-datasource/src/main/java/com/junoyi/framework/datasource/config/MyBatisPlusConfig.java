@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.junoyi.framework.datasource.datascope.interceptor.DataScopeInterceptor;
 import com.junoyi.framework.datasource.interceptor.SqlBeautifyInterceptor;
 import com.junoyi.framework.datasource.interceptor.SlowSqlInterceptor;
 import com.junoyi.framework.datasource.properties.DataSourceProperties;
@@ -12,6 +13,7 @@ import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -94,5 +96,20 @@ public class MyBatisPlusConfig {
     @Bean
     public SlowSqlInterceptor slowSqlInterceptor(DataSourceProperties properties) {
         return new SlowSqlInterceptor(properties);
+    }
+
+    /**
+     * 创建数据范围拦截器 Bean。
+     * <p>
+     * 用于自动添加数据范围过滤条件，实现行级数据权限控制。
+     * 通过配置 junoyi.datasource.data-scope.enabled=false 可禁用。
+     *
+     * @return DataScopeInterceptor 实例
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "junoyi.datasource.data-scope", name = "enabled", havingValue = "true", matchIfMissing = true)
+    public DataScopeInterceptor dataScopeInterceptor() {
+        log.info("Initializing DataScope interceptor.");
+        return new DataScopeInterceptor();
     }
 }
