@@ -477,8 +477,8 @@ SELECT * FROM biz_order WHERE (dept_id IN (5, 10, 11, 12)) AND status = 1 ORDER 
 
 **SELF (仅本人)**
 ```sql
--- 用户ID: 100
-SELECT * FROM biz_order WHERE (create_by = 100) AND status = 1 ORDER BY create_time DESC
+-- 用户名: admin
+SELECT * FROM biz_order WHERE (create_by = 'admin') AND status = 1 ORDER BY create_time DESC
 ```
 
 ### 7.2 无数据时的处理
