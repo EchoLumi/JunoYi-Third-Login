@@ -14,10 +14,11 @@
 
     <modules>
         <module>junoyi-dependencies</module>
-        <module>junoyi-server</module>
         <module>junoyi-framework</module>
-        <module>junoyi-module</module>
         <module>junoyi-module-api</module>
+        <module>junoyi-module</module>
+        <module>junoyi-server</module>
+
     </modules>
 
     <properties>
