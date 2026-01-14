@@ -36,6 +36,19 @@ public class SQLInjectionProperties {
     private List<String> excludeMethods = new ArrayList<>();
 
     /**
+     * 排除检测的参数名（这些参数不进行 SQL 注入检测）
+     * <p>
+     * 适用场景：权限标识、代码片段等包含 SQL 关键词但非注入的字段
+     * 示例：permCode, permissionCode, codeSnippet
+     */
+    private List<String> excludeParams = new ArrayList<>();
+
+    /**
+     * 排除检测的 JSON 字段路径（支持嵌套，如 data.permCode）
+     */
+    private List<String> excludeJsonFields = new ArrayList<>();
+
+    /**
      * 是否检测请求参数
      */
     private boolean filterParameter = true;

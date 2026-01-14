@@ -190,6 +190,13 @@ junoyi:
       # 排除的 URL 路径（支持 Ant 风格）
       exclude-urls:
         - /api/report/**
+      # 排除特定参数不检测
+      exclude-params:
+        - permCode
+        - permissionCode
+      # 排除特定 JSON 字段
+      exclude-json-fields:
+        - data.permCode
       # 自定义危险关键词（追加到默认列表）
       custom-keywords:
         - xp_cmdshell

@@ -139,6 +139,9 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
         Enumeration<String> paramNames = request.getParameterNames();
         while (paramNames.hasMoreElements()) {
             String name = paramNames.nextElement();
+            // 跳过排除的参数
+            if (isExcludedParam(name)) continue;
+            
             String[] values = request.getParameterValues(name);
             if (values != null) {
                 for (String value : values) {
@@ -149,6 +152,17 @@ public class SqlInjectionFilter extends OncePerRequestFilter {
             }
         }
         return null;
+    }
+
+    /**
+     * 判断参数是否在排除列表中
+     */
+    private boolean isExcludedParam(String paramName) {
+        if (properties.getExcludeParams() == null || properties.getExcludeParams().isEmpty()) {
+            return false;
+        }
+        return properties.getExcludeParams().stream()
+                .anyMatch(p -> p.equalsIgnoreCase(paramName));
     }
 
     /**

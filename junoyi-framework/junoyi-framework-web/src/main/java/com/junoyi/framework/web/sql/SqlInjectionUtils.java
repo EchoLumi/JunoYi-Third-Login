@@ -9,6 +9,11 @@ import java.util.regex.Pattern;
 
 /**
  * SQL 注入检测工具类
+ * <p>
+ * 优化策略：
+ * 1. 只检测真正危险的 SQL 注入模式，避免误报
+ * 2. 单个关键词（如 delete、select）不触发拦截
+ * 3. 只有关键词 + 危险语法结构才触发拦截
  *
  * @author Fan
  */
@@ -17,64 +22,88 @@ public class SqlInjectionUtils {
     private SqlInjectionUtils() {}
 
     /**
-     * SQL 关键词（小写）
+     * 高危 SQL 关键词（需要配合危险语法才触发）
      */
     private static final Set<String> SQL_KEYWORDS = new HashSet<>(Arrays.asList(
             "select", "insert", "update", "delete", "drop", "truncate", "alter",
-            "create", "exec", "execute", "xp_", "sp_", "0x", "union", "join",
-            "declare", "cast", "convert", "char", "nchar", "varchar", "nvarchar",
-            "waitfor", "delay", "shutdown", "grant", "revoke"
+            "create", "exec", "execute", "union", "declare", "shutdown", "grant", "revoke"
     ));
 
     /**
-     * 危险字符和模式
+     * 危险模式 - 真正的 SQL 注入攻击特征
      */
     private static final Pattern[] DANGEROUS_PATTERNS = {
-            // SQL 注释
-            Pattern.compile("--"),
-            Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL),
-            // 单引号攻击
+            // SQL 注释攻击（必须有前置内容）
+            Pattern.compile(".+--\\s*$"),
+            Pattern.compile(".+/\\*.*?\\*/", Pattern.DOTALL),
+            
+            // 经典单引号注入
             Pattern.compile("'\\s*(or|and)\\s*'", Pattern.CASE_INSENSITIVE),
             Pattern.compile("'\\s*(or|and)\\s+\\d+\\s*=\\s*\\d+", Pattern.CASE_INSENSITIVE),
             Pattern.compile("'\\s*(or|and)\\s+\\w+\\s*=\\s*\\w+", Pattern.CASE_INSENSITIVE),
-            // 1=1 / 1'='1 类型
-            Pattern.compile("\\d+\\s*=\\s*\\d+"),
-            Pattern.compile("'\\d+'\\s*=\\s*'\\d+'"),
+            Pattern.compile("'\\s*;", Pattern.CASE_INSENSITIVE),
+            
+            // 永真条件（必须有引号或特殊上下文）
+            Pattern.compile("'\\s*\\d+\\s*'\\s*=\\s*'\\s*\\d+\\s*'"),
+            Pattern.compile("\\bor\\s+\\d+\\s*=\\s*\\d+", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\band\\s+\\d+\\s*=\\s*\\d+", Pattern.CASE_INSENSITIVE),
+            
             // UNION 注入
             Pattern.compile("union\\s+(all\\s+)?select", Pattern.CASE_INSENSITIVE),
-            // 堆叠查询
-            Pattern.compile(";\\s*(select|insert|update|delete|drop|truncate)", Pattern.CASE_INSENSITIVE),
+            
+            // 堆叠查询（分号后跟 SQL 语句）
+            Pattern.compile(";\\s*(select|insert|update|delete|drop|truncate|alter|create)\\b", Pattern.CASE_INSENSITIVE),
+            
             // 时间盲注
             Pattern.compile("sleep\\s*\\(", Pattern.CASE_INSENSITIVE),
             Pattern.compile("benchmark\\s*\\(", Pattern.CASE_INSENSITIVE),
             Pattern.compile("waitfor\\s+delay", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("pg_sleep\\s*\\(", Pattern.CASE_INSENSITIVE),
+            
             // 报错注入
             Pattern.compile("extractvalue\\s*\\(", Pattern.CASE_INSENSITIVE),
             Pattern.compile("updatexml\\s*\\(", Pattern.CASE_INSENSITIVE),
-            // 系统函数
+            Pattern.compile("exp\\s*\\(\\s*~", Pattern.CASE_INSENSITIVE),
+            
+            // 系统函数调用
             Pattern.compile("load_file\\s*\\(", Pattern.CASE_INSENSITIVE),
             Pattern.compile("into\\s+(outfile|dumpfile)", Pattern.CASE_INSENSITIVE),
-            // 十六进制编码
-            Pattern.compile("0x[0-9a-fA-F]+"),
-            // 特殊字符组合
-            Pattern.compile("\\|\\|"),
-            Pattern.compile("&&")
+            
+            // 存储过程调用
+            Pattern.compile("\\bxp_\\w+", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\bsp_\\w+", Pattern.CASE_INSENSITIVE),
+            
+            // 十六进制编码的 SQL（长度 > 10 才检测，避免误报短 hex）
+            Pattern.compile("0x[0-9a-fA-F]{10,}"),
+            
+            // 字符串拼接攻击
+            Pattern.compile("concat\\s*\\(.*select", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("char\\s*\\(\\s*\\d+\\s*(,\\s*\\d+\\s*)+\\)", Pattern.CASE_INSENSITIVE)
     };
 
     /**
-     * 自定义关键词（可通过配置追加）
+     * 自定义危险模式（可通过配置追加）
      */
-    private static Set<String> customKeywords = new HashSet<>();
+    private static Set<Pattern> customPatterns = new HashSet<>();
 
     /**
-     * 设置自定义关键词
+     * 设置自定义关键词（转换为模式）
      */
     public static void setCustomKeywords(Set<String> keywords) {
-        customKeywords = keywords;
+        customPatterns.clear();
+        for (String keyword : keywords) {
+            // 自定义关键词需要配合危险语法才触发
+            customPatterns.add(Pattern.compile("\\b" + Pattern.quote(keyword) + "\\b.*[';\\-]", Pattern.CASE_INSENSITIVE));
+        }
     }
 
     /**
      * 检测是否包含 SQL 注入
+     * <p>
+     * 优化后的检测策略：
+     * 1. 先检测明确的危险模式（高置信度）
+     * 2. 再检测关键词 + 危险语法组合
+     * 3. 单独的关键词（如 delete、select）不触发拦截
      *
      * @param value 待检测内容
      * @return true 包含 SQL 注入
@@ -82,19 +111,17 @@ public class SqlInjectionUtils {
     public static boolean containsSqlInjection(String value) {
         if (StringUtils.isBlank(value)) return false;
 
-        String lowerValue = value.toLowerCase();
-
-        // 检测危险模式
+        // 检测明确的危险模式
         for (Pattern pattern : DANGEROUS_PATTERNS) {
             if (pattern.matcher(value).find()) return true;
         }
 
-        // 检测 SQL 关键词组合
-        if (containsSqlKeywordCombination(lowerValue)) return true;
+        // 检测危险的关键词组合（多个 SQL 关键词 + 危险语法）
+        if (containsDangerousKeywordCombination(value)) return true;
 
-        // 检测自定义关键词
-        for (String keyword : customKeywords) {
-            if (lowerValue.contains(keyword.toLowerCase())) return true;
+        // 检测自定义模式
+        for (Pattern pattern : customPatterns) {
+            if (pattern.matcher(value).find()) return true;
         }
 
         return false;
@@ -102,25 +129,110 @@ public class SqlInjectionUtils {
 
     /**
      * 检测是否包含危险的 SQL 关键词组合
+     * <p>
+     * 优化策略：
+     * - 需要 2 个以上 SQL 关键词同时出现
+     * - 或者 1 个关键词 + 明确的注入语法（如 ' OR、; DROP 等）
+     * - 单独的关键词（如 system.api.user.delete）不触发
      */
-    private static boolean containsSqlKeywordCombination(String value) {
-        // 检测多个 SQL 关键词组合出现
+    private static boolean containsDangerousKeywordCombination(String value) {
+        // 统计出现的 SQL 关键词
         int keywordCount = 0;
+        Set<String> foundKeywords = new HashSet<>();
+        
         for (String keyword : SQL_KEYWORDS) {
-            // 使用单词边界检测，避免误判
             if (Pattern.compile("\\b" + keyword + "\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
                 keywordCount++;
-                if (keywordCount >= 2) return true;
+                foundKeywords.add(keyword);
             }
         }
 
-        // 单个危险关键词 + 特殊字符
-        if (keywordCount >= 1) {
-            if (value.contains("'") || value.contains("\"") || value.contains(";") || value.contains("--")) {
+        // 没有关键词，安全
+        if (keywordCount == 0) return false;
+
+        // 多个关键词 + 任意危险字符
+        if (keywordCount >= 2) {
+            // 检查是否有危险语法结构
+            if (hasDangerousSyntax(value)) {
+                return true;
+            }
+            // 特殊组合：select + from / insert + into / delete + from 等
+            if (hasDangerousKeywordPair(foundKeywords, value)) {
                 return true;
             }
         }
 
+        // 单个关键词需要配合明确的注入语法
+        if (keywordCount == 1) {
+            return hasClearInjectionSyntax(value, foundKeywords.iterator().next());
+        }
+
+        return false;
+    }
+
+    /**
+     * 检测是否有危险语法结构
+     */
+    private static boolean hasDangerousSyntax(String value) {
+        // 单引号 + 逻辑运算符
+        if (Pattern.compile("'\\s*(or|and|;|--|#)", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            return true;
+        }
+        // 分号分隔的多语句
+        if (Pattern.compile(";\\s*\\w+\\s+\\w+", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 检测危险的关键词配对
+     */
+    private static boolean hasDangerousKeywordPair(Set<String> keywords, String value) {
+        // select ... from
+        if (keywords.contains("select") && 
+            Pattern.compile("\\bselect\\b.+\\bfrom\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            return true;
+        }
+        // insert ... into
+        if (keywords.contains("insert") && 
+            Pattern.compile("\\binsert\\b.+\\binto\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            return true;
+        }
+        // delete ... from
+        if (keywords.contains("delete") && 
+            Pattern.compile("\\bdelete\\b.+\\bfrom\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            return true;
+        }
+        // update ... set
+        if (keywords.contains("update") && 
+            Pattern.compile("\\bupdate\\b.+\\bset\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            return true;
+        }
+        // drop/truncate + table
+        if ((keywords.contains("drop") || keywords.contains("truncate")) && 
+            Pattern.compile("\\b(drop|truncate)\\b.+\\btable\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 检测单个关键词是否配合了明确的注入语法
+     */
+    private static boolean hasClearInjectionSyntax(String value, String keyword) {
+        // 关键词前有单引号闭合
+        if (Pattern.compile("'\\s*" + keyword + "\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            return true;
+        }
+        // 关键词前有分号（堆叠查询）
+        if (Pattern.compile(";\\s*" + keyword + "\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            return true;
+        }
+        // 关键词后跟危险语法
+        if (Pattern.compile("\\b" + keyword + "\\b\\s*['\";#]", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
+            return true;
+        }
         return false;
     }
 
@@ -162,16 +274,32 @@ public class SqlInjectionUtils {
 
         for (Pattern pattern : DANGEROUS_PATTERNS) {
             if (pattern.matcher(value).find()) {
-                return "匹配模式: " + pattern.pattern();
+                return "危险模式: " + pattern.pattern();
             }
         }
 
-        String lowerValue = value.toLowerCase();
+        // 检测关键词组合
+        int keywordCount = 0;
+        Set<String> foundKeywords = new HashSet<>();
         for (String keyword : SQL_KEYWORDS) {
             if (Pattern.compile("\\b" + keyword + "\\b", Pattern.CASE_INSENSITIVE).matcher(value).find()) {
-                if (value.contains("'") || value.contains(";")) {
-                    return "SQL关键词 + 特殊字符: " + keyword;
-                }
+                keywordCount++;
+                foundKeywords.add(keyword);
+            }
+        }
+
+        if (keywordCount >= 2 && hasDangerousSyntax(value)) {
+            return "多关键词组合: " + foundKeywords + " + 危险语法";
+        }
+
+        if (keywordCount >= 2 && hasDangerousKeywordPair(foundKeywords, value)) {
+            return "危险关键词配对: " + foundKeywords;
+        }
+
+        if (keywordCount == 1) {
+            String keyword = foundKeywords.iterator().next();
+            if (hasClearInjectionSyntax(value, keyword)) {
+                return "关键词 + 注入语法: " + keyword;
             }
         }
 
