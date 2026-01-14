@@ -35,7 +35,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/tree")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.menu.view", "system.api.menu.get"}
+            value = {"system.ui.menu.view", "system.api.menu.get.tree"}
     )
     public R<List<SysMenuVO>> getMenuTree(SysMenuQueryDTO queryDTO) {
         return R.ok(sysMenuService.getMenuTree(queryDTO));
@@ -48,7 +48,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/list")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"systme.ui.menu.view", "system.api.menu.get"}
+            value = {"systme.ui.menu.view", "system.api.menu.get.list"}
     )
     public R<PageResult<SysMenuVO>> getMenuList(SysMenuQueryDTO queryDTO) {
         return R.ok(sysMenuService.getMenuPage(queryDTO, buildPage()));
@@ -60,7 +60,7 @@ public class SysMenuController extends BaseController {
     @GetMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"systme.ui.menu.view", "system.api.menu.get"}
+            value = {"systme.ui.menu.view", "system.api.menu.get.id"}
     )
     public R<SysMenuVO> getMenuById(@PathVariable("id") Long id) {
         return R.ok(sysMenuService.getMenuById(id));
@@ -108,7 +108,7 @@ public class SysMenuController extends BaseController {
     @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"systme.ui.menu.view", "system.api.menu.delete"}
+            value = {"systme.ui.menu.view", "system.api.menu.delete.id"}
     )
     public R<?> deleteMenu(@PathVariable("id") Long id) {
         return sysMenuService.deleteMenu(id) ? R.ok() : R.fail("删除失败");
