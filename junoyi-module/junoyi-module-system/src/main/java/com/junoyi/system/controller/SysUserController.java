@@ -41,23 +41,11 @@ public class SysUserController extends BaseController {
      */
     @GetMapping("/list")
     @Permission(
-            value = {"system.ui.user.view", "system.api.user.get"}
+            value = {"system.ui.user.view", "system.api.user.get.list"}
     )
     @PlatformScope(PlatformType.ADMIN_WEB)
     public R<PageResult<SysUserVO>> getUserList(SysUserQueryDTO queryDTO){
         return R.ok(sysUserService.getUserList(queryDTO, buildPage()));
-    }
-
-    /**
-     * 通过 id 来获取用户
-     * @param id 用户 id
-     * @return 响应结果
-     */
-    @GetMapping("/{id}")
-    @Permission("system.user.data.id")
-    @PlatformScope(PlatformType.ADMIN_WEB)
-    public R<?> getUserById(@PathVariable Long id){
-        return R.ok(id);
     }
 
 
@@ -94,7 +82,7 @@ public class SysUserController extends BaseController {
     @DeleteMapping("/{id}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view", "system.api.user.delete"}
+            value = {"system.ui.user.view", "system.api.user.delete.id"}
     )
     public R<Void> deleteUser(@PathVariable("id") Long id){
         sysUserService.deleteUser(id);
@@ -107,7 +95,7 @@ public class SysUserController extends BaseController {
     @DeleteMapping("/batch")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view", "system.api.user.delete"}
+            value = {"system.ui.user.view", "system.api.user.delete.batch"}
     )
     public R<Void> deleteUserBatch(@RequestBody List<Long> ids){
         sysUserService.deleteUserBatch(ids);
@@ -120,7 +108,7 @@ public class SysUserController extends BaseController {
     @GetMapping("/{id}/roles")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view", "system.api.user.get"}
+            value = {"system.ui.user.view", "system.api.user.get.roles"}
     )
     public R<List<SysRoleVO>> getUserRoles(@PathVariable("id") Long id){
         return R.ok(sysUserService.getUserRoles(id));
@@ -132,7 +120,7 @@ public class SysUserController extends BaseController {
     @PutMapping("/{id}/roles")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view", "system.api.user.update"}
+            value = {"system.ui.user.view", "system.api.user.update.roles"}
     )
     public R<Void> updateUserRoles(@PathVariable("id") Long id, @RequestBody List<Long> roleIds){
         sysUserService.updateUserRoles(id, roleIds);
@@ -145,7 +133,7 @@ public class SysUserController extends BaseController {
     @GetMapping("/{id}/depts")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view","system.api.user.get"}
+            value = {"system.ui.user.view","system.api.user.get.depts"}
     )
     public R<List<SysDeptVO>> getUserDepts(@PathVariable("id") Long id){
         return R.ok(sysUserService.getUserDepts(id));
@@ -157,7 +145,7 @@ public class SysUserController extends BaseController {
     @PutMapping("/{id}/depts")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view", "system.api.user.update"}
+            value = {"system.ui.user.view", "system.api.user.update.depts"}
     )
     public R<Void> updateUserDepts(@PathVariable("id") Long id, @RequestBody List<Long> deptIds){
         sysUserService.updateUserDepts(id, deptIds);
@@ -185,7 +173,7 @@ public class SysUserController extends BaseController {
     @GetMapping("/{id}/permission-groups")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view","system.api.user.get"}
+            value = {"system.ui.user.view","system.api.user.get.permisson-group"}
     )
     public R<List<SysPermGroupVO>> getUserPermissionGroup(@PathVariable("id") Long id){
         return R.ok(sysUserService.getUserPermGroups(id));
@@ -197,7 +185,7 @@ public class SysUserController extends BaseController {
     @PutMapping("/{id}/permission-groups")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view","system.api.user.update"}
+            value = {"system.ui.user.view","system.api.user.update.permisson-group"}
     )
     public R<Void> updateUserGroup(@PathVariable("id") Long id, @RequestBody List<Long> groupIds){
         sysUserService.updateUserPermGroups(id, groupIds);
@@ -210,7 +198,7 @@ public class SysUserController extends BaseController {
     @GetMapping("/{id}/permissions")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view", "system.api.user.get"}
+            value = {"system.ui.user.view", "system.api.user.get.individual-perm"}
     )
     public R<List<SysUserPermVO>> getUserPermissions(@PathVariable("id") Long id) {
         return R.ok(sysUserService.getUserPerms(id));
@@ -222,7 +210,7 @@ public class SysUserController extends BaseController {
     @PostMapping("/{id}/permissions")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view", "system.api.user.update"}
+            value = {"system.ui.user.view", "system.api.user.add.individual-perm"}
     )
     public R<Void> addUserPermissions(@PathVariable("id") Long id, @RequestBody List<String> permissions) {
         sysUserService.updateUserPerms(id, permissions);
@@ -235,7 +223,7 @@ public class SysUserController extends BaseController {
     @DeleteMapping("/{id}/permissions/{permId}")
     @PlatformScope(PlatformType.ADMIN_WEB)
     @Permission(
-            value = {"system.ui.user.view", "system.api.user.update"}
+            value = {"system.ui.user.view", "system.api.user.delete.individual-perm"}
     )
     public R<Void> deleteUserPermission(@PathVariable("id") Long id, @PathVariable("permId") Long permId) {
         sysUserService.deleteUserPerm(id, permId);
