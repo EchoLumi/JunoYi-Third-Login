@@ -15,24 +15,25 @@ spring:
           username: root
           password: 123456
       
-      # Druid 连接池配置（动态数据源专用）
+      # Druid 连接池配置
       druid:
         # 基础连接池配置
         initial-size: 10
         min-idle: 10
-        max-active: 50
-        max-wait: 30000
-        
+        max-active: 20
+        max-wait: 60000
+        connect-timeout: 30000
+        socket-timeout: 60000
         # 连接检测配置
         time-between-eviction-runs-millis: 60000
         min-evictable-idle-time-millis: 300000
-        validation-query: SELECT 1
+        validation-query: SELECT 1 FROM DUAL
         test-while-idle: true
         test-on-borrow: false
         test-on-return: false
-        
         # 监控统计（简化配置）
         filters: wall
+        max-evictable-idle-time-millis:
 
   # ==================== Redis 配置 ====================
   data:
