@@ -264,7 +264,7 @@ junoyi:
       - /auth/login
       - /auth/register
       - /auth/refresh
-      - /system/info
+      - /system/info/**
       - /captcha/**
       # API 文档相关路径
       - /doc.html
