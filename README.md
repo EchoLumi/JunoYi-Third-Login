@@ -622,6 +622,13 @@ graph TB
 
 ---
 
+## 🔗 相关项目
+
+- [JunoYi 框架配套前端 Github](https://github.com/Juno-Yi/JunoYi-Vue-ElementPlus) - JunoYi 企业级后端开发框架配套前端
+- [JunoYi 框架配套前端 Gitee](https://gitee.com/juno-yi/juno-yi-vue-element-plus) - JunoYi 企业级后端开发框架配套前端
+
+--- 
+
 <div align="center">
 
 **⭐ 如果这个项目对你有帮助，请给个 Star 支持一下！**
