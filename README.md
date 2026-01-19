@@ -249,6 +249,7 @@ JunoYi
 
 ## 🏗️ 项目架构
 
+整体架构
 ```mermaid
 graph TB
     subgraph "客户端层 Client Layer"
@@ -322,6 +323,201 @@ graph TB
     F5 --> H2
     B1 --> H3
 ```
+
+请求处理流程图
+```mermaid
+sequenceDiagram
+    participant Client as 客户端
+    participant Filter as 过滤器链
+    participant Interceptor as 拦截器
+    participant Controller as 控制器
+    participant Service as 服务层
+    participant Mapper as 数据访问层
+    participant DB as 数据库
+    participant Redis as 缓存
+    
+    Client->>Filter: 1. HTTP请求
+    Filter->>Filter: 2. CORS跨域处理
+    Filter->>Filter: 3. API加密解密
+    Filter->>Filter: 4. XSS防护
+    Filter->>Filter: 5. SQL注入防护
+    Filter->>Interceptor: 6. Token认证
+    Interceptor->>Interceptor: 7. 权限校验
+    Interceptor->>Interceptor: 8. 访问日志记录
+    Interceptor->>Controller: 9. 路由到控制器
+    Controller->>Controller: 10. 参数校验
+    Controller->>Service: 11. 调用业务逻辑
+    Service->>Redis: 12. 查询缓存
+    alt 缓存命中
+        Redis-->>Service: 返回缓存数据
+    else 缓存未命中
+        Service->>Mapper: 13. 查询数据库
+        Mapper->>DB: 14. 执行SQL
+        DB-->>Mapper: 15. 返回结果
+        Mapper-->>Service: 16. 返回数据
+        Service->>Redis: 17. 更新缓存
+    end
+    Service-->>Controller: 18. 返回业务结果
+    Controller-->>Client: 19. 统一响应格式
+```
+
+模块依赖关系图
+```mermaid
+graph LR
+    subgraph "启动模块"
+        A[junoyi-server]
+    end
+    
+    subgraph "业务模块"
+        B1[junoyi-module-system]
+        B2[junoyi-module-generation]
+        B3[junoyi-module-demo]
+    end
+    
+    subgraph "API定义"
+        C1[system-api]
+        C2[generation-api]
+        C3[demo-api]
+    end
+    
+    subgraph "框架核心"
+        D1[framework-web]
+        D2[framework-security]
+        D3[framework-permission]
+        D4[framework-datasource]
+        D5[framework-redis]
+        D6[framework-core]
+    end
+    
+    subgraph "依赖管理"
+        E[junoyi-dependencies]
+    end
+    
+    A --> B1 & B2 & B3
+    B1 --> C1
+    B2 --> C2
+    B3 --> C3
+    C1 & C2 & C3 --> D1 & D2 & D3 & D4 & D5
+    D1 & D2 & D3 & D4 & D5 --> D6
+    D6 --> E
+```
+
+框架层详细架构
+```mermaid
+graph TB
+    subgraph "junoyi-framework-web Web基础设施"
+        W1[统一异常处理<br/>GlobalExceptionHandler]
+        W2[跨域配置<br/>CorsConfiguration]
+        W3[XSS防护<br/>XssFilter]
+        W4[SQL注入防护<br/>SqlInjectionFilter]
+        W5[访问日志<br/>AccessLogInterceptor]
+        W6[统一响应封装<br/>Result]
+    end
+    
+    subgraph "junoyi-framework-security 安全认证"
+        S1[JWT Token生成<br/>JwtTokenHelper]
+        S2[Token认证过滤器<br/>TokenAuthenticationFilter]
+        S3[RSA加密解密<br/>RsaCryptoHelper]
+        S4[API加密过滤器<br/>ApiEncryptFilter]
+        S5[密码工具<br/>PasswordUtils]
+        S6[会话管理<br/>SessionHelper]
+    end
+
+    subgraph "junoyi-framework-permission 权限控制"
+        P1[权限注解<br/>@Permission]
+        P2[权限切面<br/>PermissionAspect]
+        P3[权限匹配器<br/>PermissionMatcher]
+        P4[字段权限<br/>@FieldPermission]
+        P5[字段脱敏<br/>MaskUtils]
+        P6[权限助手<br/>PermissionHelper]
+    end
+    
+    subgraph "junoyi-framework-datasource 数据源管理"
+        DS1[MyBatis-Plus配置<br/>MyBatisPlusConfig]
+        DS2[分页插件<br/>PaginationInterceptor]
+        DS3[数据权限<br/>DataScopeHandler]
+        DS4[慢SQL监控<br/>SlowSqlInterceptor]
+        DS5[SQL美化<br/>SqlBeautifyInterceptor]
+        DS6[动态数据源<br/>DynamicDataSource]
+    end
+    
+    subgraph "junoyi-framework-redis 缓存管理"
+        R1[Redis工具类<br/>RedisUtils]
+        R2[Redisson配置<br/>RedissonConfig]
+        R3[分布式锁<br/>Lock4j]
+        R4[缓存注解<br/>@Cacheable]
+    end
+    
+    subgraph "junoyi-framework-captcha 验证码"
+        CA1[图形验证码<br/>ImageCaptcha]
+        CA2[滑块验证码<br/>SlideCaptcha]
+        CA3[验证码存储<br/>CaptchaStore]
+        CA4[验证码助手<br/>CaptchaHelper]
+    end
+    
+    subgraph "junoyi-framework-log 日志框架"
+        L1[日志配置<br/>JunoYiLoggingConfig]
+        L2[日志工具<br/>JunoYiLog]
+        L3[操作日志<br/>@OperationLog]
+        L4[日志切面<br/>LogAspect]
+    end
+    
+    subgraph "junoyi-framework-core 核心工具"
+        C1[统一返回<br/>Result]
+        C2[分页对象<br/>PageQuery/PageResult]
+        C3[基础异常<br/>BaseException]
+        C4[工具类<br/>Utils]
+        C5[常量定义<br/>Constants]
+        C6[对象转换<br/>MapStruct]
+    end
+```
+
+权限系统架构
+```mermaid
+graph TB
+    subgraph "权限模型 Permission Model"
+        PM1[用户 User]
+        PM2[角色 Role]
+        PM3[权限 Permission]
+        PM4[菜单 Menu]
+        PM5[部门 Dept]
+        PM6[用户组 UserGroup]
+        PM7[角色组 RoleGroup]
+        PM8[权限组 PermGroup]
+        PM9[部门组 DeptGroup]
+    end
+    
+    subgraph "权限关系 Relations"
+        R1[用户-角色<br/>N:N]
+        R2[角色-权限<br/>N:N]
+        R3[用户-权限<br/>N:N 直接授权]
+        R4[用户-部门<br/>N:N]
+        R5[用户-用户组<br/>N:N]
+        R6[角色-角色组<br/>N:N]
+        R7[权限-权限组<br/>N:N]
+        R8[部门-部门组<br/>N:N]
+    end
+    
+    subgraph "权限控制 Access Control"
+        AC1[接口权限<br/>@Permission]
+        AC2[字段权限<br/>@FieldPermission]
+        AC3[数据权限<br/>@DataScope]
+        AC4[菜单权限<br/>Menu Control]
+    end
+    
+    PM1 --> R1 --> PM2
+    PM2 --> R2 --> PM3
+    PM1 --> R3 --> PM3
+    PM1 --> R4 --> PM5
+    PM1 --> R5 --> PM6
+    PM2 --> R6 --> PM7
+    PM3 --> R7 --> PM8
+    PM5 --> R8 --> PM9
+    
+    PM3 --> AC1 & AC2 & AC3
+    PM4 --> AC4
+```
+
 
 ---
 
