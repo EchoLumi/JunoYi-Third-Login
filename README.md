@@ -221,6 +221,7 @@ http://localhost:7588/doc.html
 | 📝 开发指南 | 模块开发、对象转换、日志框架 |
 | 🔌 组件集成 | 验证码、API文档、缓存管理 |
 
+
 ```
 JunoYi
 ├── junoyi-dependencies        # 依赖版本管理
@@ -242,6 +243,7 @@ JunoYi
 ├── junoyi-server              # 启动入口
 └── junoyi-ui                  # 前端项目
 ```
+
 
 ---
 
