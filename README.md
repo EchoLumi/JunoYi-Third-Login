@@ -71,26 +71,139 @@ JunoYi（钧逸）是一个基于 **Spring Boot 3.5.0** 和 **Java 21** 打造�
 
 ### 环境要求
 
-- JDK 21+
-- Maven 3.9+
-- MySQL 8.0+
-- Redis 7.0+
+| 软件 | 版本要求 | 说明            |
+| --- | --- |---------------|
+| Java | 21 | 后端运行环境        |
+| Maven | 3.9+ | 后端打包构建环境      |
+| MySQL | 8.0+ | SQL 数据库       |
+| Redis | 7.0+ | 缓存数据库         |
+| IDEA | 2024.x | Java 开发工具（可选） |
+| Navicat | 任意 | 数据库可视化工具(可选）  |
+| DataGrip | 任意 | 数据库可视化工具（可选）|
+| Apifox | 任意 | 接口调试工具(可选) |
+| Postman | 任意 | 接口调试工具(可选) |
 
 ### 启动步骤
 
-```bash
-# 1. 克隆项目
+**1、Git 克隆本仓库**
+
+```
 git clone https://github.com/Juno-Yi/JunoYi.git
+```
 
-# 2. 导入数据库
-# 执行 sql/ 目录下的 SQL 脚本
+> Github地址： https://github.com/Juno-Yi/JunoYi.git
+> 
+> Gitee地址：https://gitee.com/juno-yi/JunoYi.git
+>
+> 两者Clone下来都是最新版本
 
-# 3. 修改配置
-# 编辑 junoyi-server/src/main/resources/application.yml
-# 配置数据库和 Redis 连接信息
+**2、导入数据库**
 
-# 4. 启动项目
-mvn spring-boot:run -pl junoyi-server
+创建数据库，
+将目录 `sql` 中的对应版本的数据库SQL，在工具中导入到数据库中。
+
+确保启动了 Redis缓存数据库
+
+**3、修改 application YAML 配置文件**
+
+```yaml
+    # 文件输出配置
+    file:
+      # 是否启用文件日志输出
+      enabled: true
+      # 日志文件存储目录（只提供目录，不包含文件名）
+      path: ./temp/logs
+      # 单个日志文件的最大大小（支持KB、MB、GB单位）
+      max-size: 100MB
+      # 保留的历史日志文件数量（超过数量的旧文件会被删除）
+      max-history: 30
+      # 所有日志文件的总大小上限（超过后会删除最旧的文件）
+      total-size-cap: 1GB
+      # 是否压缩历史日志文件（true=压缩为.gz格式，false=不压缩）
+      compress: true
+      # 日志文件编码格式
+      encoding: UTF-8
+```
+
+将这里日志存储路径 `path` 改为自己的日志存储路径
+
+```yaml
+    api-encrypt:
+      enable: false
+      # 是否加密请求体
+      request: true
+      # 是否加密响应体
+      response: true
+      # 排除路径
+      exclude-urls:
+        - /swagger-ui/**
+        - /v3/api-docs/**
+        - /doc.html
+        - /webjars/**
+        - /your-custom-path/**
+        - /system/info/logo
+```
+
+确保 `application.yml` 中的接口加密功能保持关闭，开发环境中需要将其设置为关闭，方便调试，生产环境设置为开启
+
+
+```yaml
+          url: jdbc:mysql://localhost:3306/junoyi?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+          username: root
+          password: 123456
+```
+
+将 `application-local.yml` 中的数据库url改为自己的数据库url，以及将 `username`、`password` 设置为自己的账号密码
+
+```yaml
+  # ==================== Redis 配置 ====================
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 1
+      timeout: 10s
+      # password: 123456
+```
+
+Redis配置，默认redis是没有密码的，如果有需要自行设置
+
+**4、启动项目**
+
+确保在自己的IDEA环境中，项目使用的 Java 为 Java 17，
+找到打开 `junoyi-server` 模块，该模块为项目主入口模块，启动运行打包都在该模块下，
+`com.junoyi.server` 软件包下 `JunoYiServerApplication` 主类。启动运行主类中的主函数。
+
+或 `maven` 启动 SpringBoot
+```bash
+mvn spring-boot:run
+```
+
+**5、成功启动项目**
+```text
+[2026-01-19 17:21:59.032] (main                          ) c.j.s.JunoYiServerApplica...   [INFO] 
+  - Started JunoYiServerApplication in 2.985 seconds (process running for 3.228)
+[2026-01-19 17:21:59.032] (main                          ) JUNOYI                         [INFO] 
+  - Local:      http://localhost:7588
+[2026-01-19 17:21:59.032] (main                          ) JUNOYI                         [INFO] 
+  - External:   http://10.18.40.110:7588
+[2026-01-19 17:21:59.033] (main                          ) JUNOYI                         [INFO] 
+  - Host Name:  fanzijiandeMacBook-Pro.local
+[2026-01-19 17:21:59.036] (main                          ) c.j.s.JunoYiServerApplica...   [INFO] 
+  - [JunoYi Server] Startup completed. System is now operational.
+
+  _ _/|
+ \'o.0'
+ =(___)=
+    U
+```
+
+控制台日志输出结果为这样，表示启动成功！
+
+可以通过访问 API 接口文档来测试是否成功运行！
+
+```text
+http://localhost:7588/doc.html
 ```
 
 ---
