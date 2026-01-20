@@ -153,57 +153,95 @@ public class TestController {
     }
 
     /**
-     * 统一文件上传接口（带业务类型策略）
+     * 方式1：策略上传 - 带业务类型验证
      * <p>
      * 根据业务类型自动应用对应的上传策略，包括：
-     * - 文件类型验证
-     * - 文件大小限制
-     * - 自动路径分类
+     * - 文件类型验证（只允许特定类型）
+     * - 文件大小限制（不同业务类型有不同限制）
+     * - 自动路径分类（存储到对应业务目录）
+     * <p>
+     * 适用场景：需要严格控制文件类型和大小的业务场景
      * 
      * @param file 上传的文件
      * @param businessType 业务类型：avatar(头像)、document(文档)、image(图片)、video(视频)、audio(音频)、other(其他)
      * @return 文件信息
      */
-    @PostMapping("/upload-with-strategy")
+    @PostMapping("/upload-strategy")
     public R<FileInfo> uploadWithStrategy(@RequestParam("file") MultipartFile file,
                                           @RequestParam("businessType") String businessType) {
         try {
-            log.info("Demo", "开始上传文件: {}, 业务类型: {}", file.getOriginalFilename(), businessType);
+            log.info("Demo", "【策略上传】开始上传文件: {}, 业务类型: {}", file.getOriginalFilename(), businessType);
             
+            // 使用策略上传，会进行文件类型和大小验证
             FileInfo fileInfo = fileHelper.uploadWithStrategy(file, businessType);
             
-            log.info("Demo", "文件上传成功: {}", fileInfo.getFileUrl());
+            log.info("Demo", "【策略上传】文件上传成功: {}", fileInfo.getFileUrl());
             return R.ok(fileInfo);
         } catch (IllegalArgumentException e) {
-            log.warn("Demo", "文件上传验证失败: {}", e.getMessage());
+            log.warn("Demo", "【策略上传】文件验证失败: {}", e.getMessage());
             return R.fail(e.getMessage());
         } catch (Exception e) {
-            log.error("Demo", "文件上传失败: {}", e.getMessage());
+            log.error("Demo", "【策略上传】文件上传失败: {}", e.getMessage());
             return R.fail("文件上传失败: " + e.getMessage());
         }
     }
 
     /**
-     * 测试文件上传
+     * 方式2：智能检测上传 - 自动识别文件类型
      * <p>
-     * 上传文件到配置的存储服务（本地存储或阿里云OSS）
+     * 根据文件的 MIME 类型和扩展名自动检测业务类型，并存储到对应目录：
+     * - 图片文件 → image/ 目录
+     * - 视频文件 → video/ 目录
+     * - 音频文件 → audio/ 目录
+     * - 文档文件 → document/ 目录
+     * - 其他文件 → other/ 目录
+     * <p>
+     * 适用场景：不需要严格验证，但希望自动分类存储的场景
      * 
      * @param file 上传的文件
-     * @param path 可选的存储路径，不传则使用默认路径（按日期分类）
-     * @return 文件信息，包含文件URL、大小、类型等
+     * @return 文件信息
      */
-    @PostMapping("/upload")
-    public R<FileInfo> testUpload(@RequestParam("file") MultipartFile file,
-                                   @RequestParam(value = "path", required = false) String path) {
+    @PostMapping("/upload-auto")
+    public R<FileInfo> uploadWithAutoDetect(@RequestParam("file") MultipartFile file) {
         try {
-            log.info("Demo", "开始上传文件: {}, 大小: {} bytes", file.getOriginalFilename(), file.getSize());
+            log.info("Demo", "【智能检测上传】开始上传文件: {}, 大小: {} bytes", file.getOriginalFilename(), file.getSize());
             
-            FileInfo fileInfo = fileHelper.upload(file, path);
+            // 不传路径参数，会自动根据文件类型检测并分类存储
+            FileInfo fileInfo = fileHelper.upload(file);
             
-            log.info("Demo", "文件上传成功: {}", fileInfo.getFileUrl());
+            log.info("Demo", "【智能检测上传】文件上传成功: {}", fileInfo.getFileUrl());
             return R.ok(fileInfo);
         } catch (Exception e) {
-            log.error("Demo", "文件上传失败: {}", e.getMessage());
+            log.error("Demo", "【智能检测上传】文件上传失败: {}", e.getMessage());
+            return R.fail("文件上传失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 方式3：手动指定路径上传 - 完全自定义
+     * <p>
+     * 手动指定文件存储的业务类型路径，不进行任何验证和自动检测。
+     * 最终存储路径格式：指定路径/yyyy/MM/dd/文件名
+     * <p>
+     * 适用场景：需要完全自定义存储路径的场景
+     * 
+     * @param file 上传的文件
+     * @param path 存储路径（业务类型），如：avatar、document、image、custom-path 等
+     * @return 文件信息
+     */
+    @PostMapping("/upload-manual")
+    public R<FileInfo> uploadWithManualPath(@RequestParam("file") MultipartFile file,
+                                            @RequestParam("path") String path) {
+        try {
+            log.info("Demo", "【手动路径上传】开始上传文件: {}, 指定路径: {}", file.getOriginalFilename(), path);
+            
+            // 手动指定路径，不进行验证和检测
+            FileInfo fileInfo = fileHelper.upload(file, path);
+            
+            log.info("Demo", "【手动路径上传】文件上传成功: {}", fileInfo.getFileUrl());
+            return R.ok(fileInfo);
+        } catch (Exception e) {
+            log.error("Demo", "【手动路径上传】文件上传失败: {}", e.getMessage());
             return R.fail("文件上传失败: " + e.getMessage());
         }
     }
