@@ -7,7 +7,7 @@
 
     <groupId>com.junoyi</groupId>
     <artifactId>junoyi-dependencies</artifactId>
-    <version>0.3.4-alpha</version>
+    <version>0.4.0-alpha</version>
     <packaging>pom</packaging>
     <name>junoyi-dependencies</name>
     <description>
