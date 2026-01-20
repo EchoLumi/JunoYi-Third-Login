@@ -3,10 +3,7 @@ package com.junoyi.framework.file.helper;
 import com.junoyi.framework.file.domain.FileInfo;
 import com.junoyi.framework.file.factory.FileStorageFactory;
 import com.junoyi.framework.file.storage.FileStorage;
-import com.junoyi.framework.log.core.JunoYiLog;
-import com.junoyi.framework.log.core.JunoYiLogFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -18,11 +15,8 @@ import java.io.InputStream;
  *
  * @author Fan
  */
-@Component
 @RequiredArgsConstructor
 public class FileHelper {
-
-    private static final JunoYiLog log = JunoYiLogFactory.getLogger(FileHelper.class);
 
     private final FileStorageFactory fileStorageFactory;
 
@@ -44,7 +38,7 @@ public class FileHelper {
      * @return 文件信息
      */
     public FileInfo upload(MultipartFile file, String path) {
-        FileStorage storage = fileStorageFactory.createFileStorage();
+        FileStorage storage = fileStorageFactory.getStorage();
         return storage.upload(file, path);
     }
 
@@ -58,7 +52,7 @@ public class FileHelper {
      * @return 文件信息
      */
     public FileInfo upload(InputStream inputStream, String fileName, String path, String contentType) {
-        FileStorage storage = fileStorageFactory.createFileStorage();
+        FileStorage storage = fileStorageFactory.getStorage();
         return storage.upload(inputStream, fileName, path, contentType);
     }
 
@@ -69,7 +63,7 @@ public class FileHelper {
      * @return 文件字节数组
      */
     public byte[] download(String filePath) {
-        FileStorage storage = fileStorageFactory.createFileStorage();
+        FileStorage storage = fileStorageFactory.getStorage();
         return storage.download(filePath);
     }
 
@@ -80,7 +74,7 @@ public class FileHelper {
      * @return 是否删除成功
      */
     public boolean delete(String filePath) {
-        FileStorage storage = fileStorageFactory.createFileStorage();
+        FileStorage storage = fileStorageFactory.getStorage();
         return storage.delete(filePath);
     }
 
@@ -91,7 +85,7 @@ public class FileHelper {
      * @return 是否存在
      */
     public boolean exists(String filePath) {
-        FileStorage storage = fileStorageFactory.createFileStorage();
+        FileStorage storage = fileStorageFactory.getStorage();
         return storage.exists(filePath);
     }
 
@@ -102,7 +96,7 @@ public class FileHelper {
      * @return 访问URL
      */
     public String getFileUrl(String filePath) {
-        FileStorage storage = fileStorageFactory.createFileStorage();
+        FileStorage storage = fileStorageFactory.getStorage();
         return storage.getFileUrl(filePath);
     }
 
@@ -114,7 +108,7 @@ public class FileHelper {
      * @return 访问URL
      */
     public String getFileUrl(String filePath, long expireSeconds) {
-        FileStorage storage = fileStorageFactory.createFileStorage();
+        FileStorage storage = fileStorageFactory.getStorage();
         return storage.getFileUrl(filePath, expireSeconds);
     }
 }

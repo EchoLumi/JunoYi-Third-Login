@@ -36,6 +36,23 @@ public class AliyunOssFileStorage implements FileStorage {
         this.properties = properties;
         FileStorageProperties.AliyunOssConfig config = properties.getAliyunOss();
         
+        // 验证必要的配置项
+        if (StrUtil.isBlank(config.getEndpoint())) {
+            throw new IllegalArgumentException("阿里云OSS配置错误: endpoint 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.endpoint");
+        }
+        if (StrUtil.isBlank(config.getAccessKeyId())) {
+            throw new IllegalArgumentException("阿里云OSS配置错误: access-key-id 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.access-key-id");
+        }
+        if (StrUtil.isBlank(config.getAccessKeySecret())) {
+            throw new IllegalArgumentException("阿里云OSS配置错误: access-key-secret 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.access-key-secret");
+        }
+        if (StrUtil.isBlank(config.getBucketName())) {
+            throw new IllegalArgumentException("阿里云OSS配置错误: bucket-name 不能为空，请在配置文件中设置 junoyi.file.aliyun-oss.bucket-name");
+        }
+        
+        log.info("[File] Initializing Aliyun OSS client, endpoint: {}, bucket: {}", 
+                config.getEndpoint(), config.getBucketName());
+        
         this.ossClient = new OSSClientBuilder().build(
                 config.getEndpoint(),
                 config.getAccessKeyId(),

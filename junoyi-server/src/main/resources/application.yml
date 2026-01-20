@@ -131,14 +131,14 @@ junoyi:
     storage-type: local  # 存储类型
     domain: http://localhost:7588  # 访问域名
     local:
-      base-path: ./upload  # 本地存储根路径
+      base-path: ./temp/upload  # 本地存储根路径
       url-prefix: /files   # URL路径前缀
     aliyun-oss:
       access-key-id: your-access-key-id
       access-key-secret: your-access-key-secret
-      bucket-name: your-bucket-name
+      bucket-name: junoyi
       endpoint: oss-cn-hangzhou.aliyuncs.com
-      custom-domain: https://cdn.yourdomain.com  # 可选，自定义域名
+#      custom-domain: https://cdn.yourdomain.com
     minio:
       endpoint: http://localhost:9000
       access-key: minioadmin
