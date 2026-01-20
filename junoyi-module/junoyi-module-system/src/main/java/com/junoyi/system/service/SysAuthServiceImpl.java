@@ -484,21 +484,18 @@ public class SysAuthServiceImpl implements ISysAuthService {
 
     /**
      * 获取用户信息
-     * 优化：直接从 LoginUser（Redis Session）中获取权限信息，避免重复查询数据库
-     * 
+     *
      * @param loginUser 用户会话信息（已包含权限、角色、部门等信息）
      * @return 返回用户信息
      */
     public UserInfoVO getUserInfo(LoginUser loginUser){
         Long userId = loginUser.getUserId();
 
-        // 直接通过 ID 查询（selectById 不会被数据范围拦截器影响）
         SysUser sysUser = null;
         try {
             sysUser = sysUserMapper.selectById(userId);
         } catch (Exception e) {
             log.error("[getUserInfo] 查询用户失败, userId: {}, 异常: {}", userId, e.getMessage());
-            // 打印完整堆栈
             if (e.getCause() != null) {
                 log.error("[getUserInfo] 根本原因: {}", e.getCause().getMessage(), e.getCause());
             }
