@@ -153,6 +153,37 @@ public class TestController {
     }
 
     /**
+     * 统一文件上传接口（带业务类型策略）
+     * <p>
+     * 根据业务类型自动应用对应的上传策略，包括：
+     * - 文件类型验证
+     * - 文件大小限制
+     * - 自动路径分类
+     * 
+     * @param file 上传的文件
+     * @param businessType 业务类型：avatar(头像)、document(文档)、image(图片)、video(视频)、audio(音频)、other(其他)
+     * @return 文件信息
+     */
+    @PostMapping("/upload-with-strategy")
+    public R<FileInfo> uploadWithStrategy(@RequestParam("file") MultipartFile file,
+                                          @RequestParam("businessType") String businessType) {
+        try {
+            log.info("Demo", "开始上传文件: {}, 业务类型: {}", file.getOriginalFilename(), businessType);
+            
+            FileInfo fileInfo = fileHelper.uploadWithStrategy(file, businessType);
+            
+            log.info("Demo", "文件上传成功: {}", fileInfo.getFileUrl());
+            return R.ok(fileInfo);
+        } catch (IllegalArgumentException e) {
+            log.warn("Demo", "文件上传验证失败: {}", e.getMessage());
+            return R.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("Demo", "文件上传失败: {}", e.getMessage());
+            return R.fail("文件上传失败: " + e.getMessage());
+        }
+    }
+
+    /**
      * 测试文件上传
      * <p>
      * 上传文件到配置的存储服务（本地存储或阿里云OSS）
