@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * <p>
  * 根据配置创建对应的文件存储实现
  *
- * @author JunoYi
+ * @author Fan
  */
 @Slf4j
 @Component

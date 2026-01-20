@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 文件存储类型枚举
  *
- * @author JunoYi
+ * @author Fan
  */
 @Getter
 @AllArgsConstructor

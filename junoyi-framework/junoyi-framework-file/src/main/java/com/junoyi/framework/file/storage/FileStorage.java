@@ -10,7 +10,7 @@ import java.io.InputStream;
  * <p>
  * 定义文件存储的统一接口，支持多种存储实现
  *
- * @author JunoYi
+ * @author Fan
  */
 public interface FileStorage {
 

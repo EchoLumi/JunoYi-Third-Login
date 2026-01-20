@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 /**
  * 文件存储自动配置
  *
- * @author JunoYi
+ * @author Fan
  */
 @Slf4j
 @AutoConfiguration
@@ -18,6 +18,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class FileStorageConfiguration {
 
     public FileStorageConfiguration(FileStorageProperties properties) {
-        log.info("文件存储模块初始化完成，当前存储类型: {}", properties.getStorageType().getName());
+        log.info("[{}] File management module initialization completed.","File Manager");
+        log.info("Current storage type：{}",properties.getStorageType().getName());
     }
 }

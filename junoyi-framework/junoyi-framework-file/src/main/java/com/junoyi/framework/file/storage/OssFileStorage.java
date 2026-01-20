@@ -22,7 +22,7 @@ import java.util.Date;
 /**
  * 阿里云OSS文件存储实现
  *
- * @author JunoYi
+ * @author Fan
  */
 @Slf4j
 public class OssFileStorage implements FileStorage {

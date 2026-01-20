@@ -88,6 +88,12 @@
             <artifactId>junoyi-framework-api-doc</artifactId>
         </dependency>
 
+        <!--   文件管理     -->
+        <dependency>
+            <groupId>com.junoyi</groupId>
+            <artifactId>junoyi-framework-file</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

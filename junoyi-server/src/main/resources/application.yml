@@ -126,6 +126,25 @@ junoyi:
       # 默认用户字段名（默认 create_by）
       default-user-field: create_by
 
+  # ==================== 文件存储配置 ====================
+  file:
+    storage-type: local  # 存储类型
+    domain: http://localhost:7588  # 访问域名
+    local:
+      base-path: ./upload  # 本地存储根路径
+      url-prefix: /files   # URL路径前缀
+    aliyun-oss:
+      access-key-id: your-access-key-id
+      access-key-secret: your-access-key-secret
+      bucket-name: your-bucket-name
+      endpoint: oss-cn-hangzhou.aliyuncs.com
+      custom-domain: https://cdn.yourdomain.com  # 可选，自定义域名
+    minio:
+      endpoint: http://localhost:9000
+      access-key: minioadmin
+      secret-key: minioadmin
+      bucket-name: junoyi
+
   # ==================== 事件配置 ====================
   event:
 

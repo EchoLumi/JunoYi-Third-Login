@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * 文件存储配置属性
  *
- * @author JunoYi
+ * @author Fan
  */
 @Data
 @ConfigurationProperties(prefix = "junoyi.file")
