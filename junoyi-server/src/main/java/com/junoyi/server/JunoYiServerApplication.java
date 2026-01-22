@@ -5,7 +5,6 @@ import com.junoyi.framework.log.core.JunoYiLog;
 import com.junoyi.framework.log.core.JunoYiLogFactory;
 import com.junoyi.framework.stater.JunoYiApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 
 /**
@@ -13,10 +12,7 @@ import org.springframework.cache.annotation.EnableCaching;
  *
  * @author Fan
  */
-@SpringBootApplication(
-    scanBasePackages = {"com.junoyi"},
-    exclude = {DataSourceAutoConfiguration.class}
-)
+@SpringBootApplication(scanBasePackages = {"com.junoyi"})
 @EnableCaching
 public class JunoYiServerApplication {
     private static final JunoYiLog log = JunoYiLogFactory.getLogger(JunoYiServerApplication.class);

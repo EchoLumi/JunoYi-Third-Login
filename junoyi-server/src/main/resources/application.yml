@@ -395,6 +395,11 @@ logging:
 spring:
   profiles:
     active: local
+
+  # 自动配置排除
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   
   # DevTools 配置
   devtools:
